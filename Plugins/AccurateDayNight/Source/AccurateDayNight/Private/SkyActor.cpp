@@ -265,11 +265,7 @@ void ASkyActor::UpdateSun(const FRotator& SunRotator)
 {
 	if (SureSunComponent())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("IsValid"));
 		SunComponent->SetSunRotation(SunRotator);
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("IsInvalid"));
 	}
 }
 

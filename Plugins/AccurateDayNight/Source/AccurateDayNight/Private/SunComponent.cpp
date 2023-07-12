@@ -31,13 +31,10 @@ USunComponent::USunComponent()
 
 void USunComponent::SetSunRotation(const FRotator& SunRotator)
 {
-	/*if (::IsValid(SunDirectionalLight) &&
-		SunDirectionalLight->Mobility.GetValue() == EComponentMobility::Movable
-		)
-	{*/
-		UE_LOG(LogTemp, Warning, TEXT("SetSunRotation"));
+	if (this->Mobility.GetValue() == EComponentMobility::Movable)
+	{
 		this->SetWorldRotation(SunRotator);
-	//}
+	}
 }
 
 void USunComponent::SetIntensity(float Value)

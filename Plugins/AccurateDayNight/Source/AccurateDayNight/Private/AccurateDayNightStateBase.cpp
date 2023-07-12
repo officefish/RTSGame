@@ -350,8 +350,8 @@ void AAccurateDayNightStateBase::Tick(float DeltaTime)
 	//FString NewDateTimeStr = FullDateTime.ToString(TEXT("%Y.%m.%d-%H.%M.%S"));
 	//UE_LOG(LogTemp, Warning, TEXT("FullDateTime: %s"), *NewDateTimeStr);
 
-	FString FullDateStr = FullDateTime.ToString(TEXT("%Y.%m.%d-%H.%M.%S"));
-	UE_LOG(LogTemp, Warning, TEXT("FullDate: %s"), *FullDateStr);
+	//FString FullDateStr = FullDateTime.ToString(TEXT("%Y.%m.%d-%H.%M.%S"));
+	//UE_LOG(LogTemp, Warning, TEXT("FullDate: %s"), *FullDateStr);
 }
 
 void AAccurateDayNightStateBase::SetDayNightTransitionTime(int32 Hour, int32 Minute)

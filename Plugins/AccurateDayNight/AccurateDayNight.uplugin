@@ -1,0 +1,24 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "AccurateDayNight",
+	"Description": "",
+	"Category": "Other",
+	"CreatedBy": "Techies",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "AccurateDayNight",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}

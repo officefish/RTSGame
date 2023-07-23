@@ -6,7 +6,54 @@
 #include "GameFramework/GameStateBase.h"
 #include "Misc/DateTime.h"
 #include "Misc/Timespan.h"
+#include "Math/UnrealMathUtility.h"
 #include "AccurateDayNightStateBase.generated.h"
+
+USTRUCT(BlueprintType)
+struct FDemiSeasonKeyFrames
+{
+	GENERATED_BODY()
+
+public:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AccurateSeason")
+		FDateTime SpringStartTime;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AccurateSeason")
+		FDateTime SpringTime;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AccurateSeason")
+		FDateTime SummerStartTime;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AccurateSeason")
+		FDateTime SummerTime;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AccurateSeason")
+		FDateTime AutumnStartTime;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AccurateSeason")
+		FDateTime AutumnTime;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AccurateSeason")
+		FDateTime WinterStartTime;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AccurateSeason")
+		FDateTime WinterTime;
+
+};
+
+UENUM(BlueprintType)
+enum class EEDemiSeason : uint8
+{
+	WinterToSpring			UMETA(DisplayName = "WinterToSpring"),
+	Spring					UMETA(DisplayName = "Spring"),
+	SpringToSummer			UMETA(DisplayName = "SpringToSummer"),
+	Summer					UMETA(DisplayName = "Summer"),
+	SummerToAutumn			UMETA(DisplayName = "SummerToAutumn"),
+	Autumn					UMETA(DisplayName = "Autumn"),
+	AutumnToWinter			UMETA(DisplayName = "AutumnToWinter"),
+	Winter					UMETA(DisplayName = "Winter"),
+};
 
 UENUM(BlueprintType)
 enum class EEGameSpeed : uint8
@@ -49,6 +96,10 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDayNightCicleDelegate, TEnumAsByte<
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDayNightScheduleDelegate, TEnumAsByte<EEDayNightSchedule>, EDayNightSchedule);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGameSpeedDelegate, TEnumAsByte<EEGameSpeed>, EGameSpeed);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGameStateTickDelegate, FDateTime, TickDateTime);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDemiSeasonDelegate, 
+	TEnumAsByte<EEDemiSeason>, Season,
+	float, Delta);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FNewDayDelegate);
 
@@ -118,6 +169,10 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "AccurateDayNight")
 		FGameStateTickDelegate OnGameStateTickDelegate;
 
+	// Delegates
+	UPROPERTY(BlueprintAssignable, Category = "AccurateDayNight")
+		FDemiSeasonDelegate OnSeasonChangeDelegate;
+
 	// DayNightCicle
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AccurateDayNight")
 		FTimespan SunsetTime;
@@ -125,7 +180,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AccurateDayNight")
 		FTimespan SunriseTime;
 
-	// Enum example
+	// Enums
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AccurateDayNight")
+		TEnumAsByte<EEDemiSeason> ECurrentDemiSeason;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AccurateDayNight")
 		TEnumAsByte<EEGameSpeed> EGameSpeed;
 
@@ -163,8 +221,20 @@ public:
 private:
 
 	float GetTimeMuliplier();
+
 	TEnumAsByte<EEDayNightCicle> DefineDayNightCycle(const int32& NumMinutes);
+	
 	TEnumAsByte<EEDayNightSchedule> DefineDayNightSchedule(const int32& NumHours);
+
+	TEnumAsByte<EEDemiSeason> DefineDemiSeason(const FDateTime& CurrentDateTime, const FDemiSeasonKeyFrames& KeyFrames);
+
+	FDemiSeasonKeyFrames GetCurrentDemiSeasonKeyFrames(
+		const FDateTime& CurrentDateTime, const FTimespan& Inconstancy, const FTimespan& NumDays );
+
+	float DefineDemiSeasonDelta(
+		TEnumAsByte<EEDemiSeason> CurrentSeason,
+		const FDemiSeasonKeyFrames& CurrentSeasonKeyFrames,
+		const FDateTime& CurrentDateTime);
 
 protected:
 
@@ -174,6 +244,15 @@ protected:
 
 private:
 
+	/* Season pass Keyframes  */
+
+	FDemiSeasonKeyFrames SeasonKeyFrames;
+	FTimespan DemiSeasonNumDays;
+	FTimespan DemiSeasonInconstancy;
+
+
+	/* GameSpeed modes multiplier */
+	
 	float GameTimeMultiplier;
 	float GameTimeMultiplierX2;
 	float GameTimeMultiplierX5;

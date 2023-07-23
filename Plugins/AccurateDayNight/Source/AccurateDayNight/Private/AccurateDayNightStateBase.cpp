@@ -15,6 +15,12 @@ AAccurateDayNightStateBase::AAccurateDayNightStateBase()
 	bWithRealTime = true;
 	EGameSpeed = EEGameSpeed::GameTime;
 
+	// Demiseason period in days
+	DemiSeasonNumDays = FTimespan::FromDays(14.0f);
+
+	// Early/late start demi season incontancy
+	DemiSeasonInconstancy = FTimespan::FromDays(7.0f);
+
 	SetGameTimeMultiplier(60.0f);
 	SetGameStartDateTime(FDateTime::UtcNow());
 
@@ -25,7 +31,109 @@ AAccurateDayNightStateBase::AAccurateDayNightStateBase()
 
 	bWithDayNightCycle = true;
 
+	/*Setup default DemiSeason entities */
 
+	
+
+}
+
+FDemiSeasonKeyFrames AAccurateDayNightStateBase::GetCurrentDemiSeasonKeyFrames(
+	const FDateTime& CurrentDateTime,
+	const FTimespan& Inconstancy, 
+	const FTimespan& NumDays
+)
+{
+	FDemiSeasonKeyFrames CurrentSeasonKeyFrames;
+
+	/* Generate random season shifts */
+	int32 RandomSpringShift = FMath::RandRange(0, Inconstancy.GetDays());
+	int32 RandomSummerShift = FMath::RandRange(0, Inconstancy.GetDays());
+	int32 RandomAutumnShift = FMath::RandRange(0, Inconstancy.GetDays());
+	int32 RandomWinterShift = FMath::RandRange(0, Inconstancy.GetDays());
+
+	/* Get Season Bases */
+	int32 SpringStart = 31 + 28;
+	int32 SummerStart = SpringStart + 91;
+	int32 AutumnStart = SummerStart + 91;
+	int32 WinterStart = AutumnStart + 91;
+
+	FTimespan SpringStartTimespan = FTimespan::FromDays(
+		SpringStart - Inconstancy.GetDays() / 2 + RandomSpringShift);
+
+	FTimespan SummerStartTimespan = FTimespan::FromDays(
+		SummerStart - Inconstancy.GetDays() / 2 + RandomSummerShift);
+
+	FTimespan AutumnStartTimespan = FTimespan::FromDays(
+		AutumnStart - Inconstancy.GetDays() / 2 + RandomAutumnShift);
+
+	FTimespan WinterStartTimespan = FTimespan::FromDays(
+		WinterStart - Inconstancy.GetDays() / 2 + RandomWinterShift);
+
+	/*Make demi season start frames */
+
+	/* ... Spring frames */
+	FDateTime SpringStartDateTime{ CurrentDateTime.GetYear(), 1, 1 };	
+	SpringStartDateTime += SpringStartTimespan;
+	
+	CurrentSeasonKeyFrames.SpringStartTime = SpringStartDateTime;
+	CurrentSeasonKeyFrames.SpringTime = SpringStartDateTime + NumDays;
+
+	/* ... Summer frames */
+	FDateTime SummerStartDateTime{ CurrentDateTime.GetYear(), 1, 1 };
+	SummerStartDateTime += SummerStartTimespan;
+
+	CurrentSeasonKeyFrames.SummerStartTime = SummerStartDateTime;
+	CurrentSeasonKeyFrames.SummerTime = SummerStartDateTime + NumDays;
+
+	/* ... Autumn frames */
+	FDateTime AutumnStartDateTime{ CurrentDateTime.GetYear(), 1, 1 };
+	AutumnStartDateTime += AutumnStartTimespan;
+
+	CurrentSeasonKeyFrames.AutumnStartTime = AutumnStartDateTime;
+	CurrentSeasonKeyFrames.AutumnTime = AutumnStartDateTime + NumDays;
+
+	/* ... Winter frames */
+	FDateTime WinterStartDateTime{ CurrentDateTime.GetYear(), 1, 1 };
+	WinterStartDateTime += WinterStartTimespan;
+
+	CurrentSeasonKeyFrames.WinterStartTime = WinterStartDateTime;
+	CurrentSeasonKeyFrames.WinterTime = WinterStartDateTime + NumDays;
+
+	/* Logging */
+
+	//FString SpringStartTimeStr = CurrentSeasonKeyFrames.SpringStartTime
+	//	.ToString(TEXT("%Y.%m.%d-%H.%M.%S"));
+	//UE_LOG(LogTemp, Warning, TEXT("Spring StartTime: %s"), *SpringStartTimeStr);
+
+	//FString SpringTimeStr = CurrentSeasonKeyFrames.SpringTime
+	//	.ToString(TEXT("%Y.%m.%d-%H.%M.%S"));
+	//UE_LOG(LogTemp, Warning, TEXT("Spring Time: %s"), *SpringTimeStr);
+
+	//FString SummerStartTimeStr = CurrentSeasonKeyFrames.SummerStartTime
+	//	.ToString(TEXT("%Y.%m.%d-%H.%M.%S"));
+	//UE_LOG(LogTemp, Warning, TEXT("Summer StartTime: %s"), *SummerStartTimeStr);
+
+	//FString SummerTimeStr = CurrentSeasonKeyFrames.SummerTime
+	//	.ToString(TEXT("%Y.%m.%d-%H.%M.%S"));
+	//UE_LOG(LogTemp, Warning, TEXT("Summer Time: %s"), *SummerTimeStr);
+
+	//FString AutumnStartTimeStr = CurrentSeasonKeyFrames.AutumnStartTime
+	//	.ToString(TEXT("%Y.%m.%d-%H.%M.%S"));
+	//UE_LOG(LogTemp, Warning, TEXT("Autumn StartTime: %s"), *AutumnStartTimeStr);
+
+	//FString AutumnTimeStr = CurrentSeasonKeyFrames.AutumnTime
+	//	.ToString(TEXT("%Y.%m.%d-%H.%M.%S"));
+	//UE_LOG(LogTemp, Warning, TEXT("Autumn Time: %s"), *AutumnTimeStr);
+
+	//FString WinterStartTimeStr = CurrentSeasonKeyFrames.WinterStartTime
+	//	.ToString(TEXT("%Y.%m.%d-%H.%M.%S"));
+	//UE_LOG(LogTemp, Warning, TEXT("Winter StartTime: %s"), *WinterStartTimeStr);
+
+	//FString WinterTimeStr = CurrentSeasonKeyFrames.WinterTime
+	//	.ToString(TEXT("%Y.%m.%d-%H.%M.%S"));
+	//UE_LOG(LogTemp, Warning, TEXT("Winter Time: %s"), *WinterTimeStr);
+
+	return CurrentSeasonKeyFrames;
 
 }
 
@@ -53,14 +161,15 @@ void AAccurateDayNightStateBase::SetGameStartDateTime(const FDateTime& DateTime)
 {
 	GameStartDateTime = DateTime;
 
-	//FString FullDateStr = GameStartDateTime.ToString(TEXT("%Y.%m.%d-%H.%M.%S"));
-	//UE_LOG(LogTemp, Warning, TEXT("GameStartDateTime: %s"), *FullDateStr);
-
 	int NumHours = GameStartDatetime.GetHour();
 	EDayNightCycle = DefineDayNightCycle(NumHours);
 	TimePasses = FTimespan(0, 0, 0, 0);
 	FullDateTime = DateTime;
 	TotalSeconds = 0.0f;
+
+	// Calculate Demi season keyframes
+	SeasonKeyFrames = GetCurrentDemiSeasonKeyFrames(
+		GameStartDateTime, DemiSeasonInconstancy, DemiSeasonNumDays);
 }
 
 
@@ -285,6 +394,124 @@ TEnumAsByte<EEDayNightSchedule> AAccurateDayNightStateBase::DefineDayNightSchedu
 	}
 }
 
+TEnumAsByte<EEDemiSeason> AAccurateDayNightStateBase::DefineDemiSeason(
+	const FDateTime& CurrentDateTime, const FDemiSeasonKeyFrames& KeyFrames)
+{
+	//UE_LOG()
+
+	int32 NumDays = CurrentDateTime.GetDayOfYear();
+
+	if (NumDays < KeyFrames.SpringStartTime.GetDayOfYear())
+	{
+		return EEDemiSeason::Winter;
+	}
+	else if (NumDays >= KeyFrames.SpringStartTime.GetDayOfYear()
+		&& NumDays < KeyFrames.SpringTime.GetDayOfYear())
+	{
+		return EEDemiSeason::WinterToSpring;
+	}
+	else if (NumDays >= KeyFrames.SpringTime.GetDayOfYear()
+		&& NumDays < KeyFrames.SummerStartTime.GetDayOfYear())
+	{
+		return EEDemiSeason::Spring;
+	}
+	else if (NumDays >= KeyFrames.SummerStartTime.GetDayOfYear()
+		&& NumDays < KeyFrames.SummerTime.GetDayOfYear())
+	{
+		return EEDemiSeason::SpringToSummer;
+	}
+	else if (NumDays >= KeyFrames.SummerTime.GetDayOfYear()
+		&& NumDays < KeyFrames.AutumnStartTime.GetDayOfYear())
+	{
+		return EEDemiSeason::Summer;
+	}
+	else if (NumDays >= KeyFrames.AutumnStartTime.GetDayOfYear()
+		&& NumDays < KeyFrames.AutumnTime.GetDayOfYear())
+	{
+		return EEDemiSeason::SummerToAutumn;
+	}
+	else if (NumDays >= KeyFrames.AutumnTime.GetDayOfYear()
+		&& NumDays < KeyFrames.WinterStartTime.GetDayOfYear())
+	{
+		return EEDemiSeason::Autumn;
+	}
+	else if (NumDays >= KeyFrames.WinterStartTime.GetDayOfYear()
+		&& NumDays < KeyFrames.WinterTime.GetDayOfYear())
+	{
+		return EEDemiSeason::AutumnToWinter;
+	}
+	else {
+		return EEDemiSeason::Winter;
+	}
+}
+
+float AAccurateDayNightStateBase::DefineDemiSeasonDelta(
+	TEnumAsByte<EEDemiSeason> CurrentSeason,
+	const FDemiSeasonKeyFrames& CurrentSeasonKeyFrames,
+	const FDateTime& CurrentDateTime)
+{
+	switch (CurrentSeason) {
+	case EEDemiSeason::Spring:
+		{
+			return 1.0;
+		}
+	case EEDemiSeason::Summer:
+		{
+			return 1.0;
+		}
+	case EEDemiSeason::Autumn:
+		{
+			return 1.0;
+		}
+	case EEDemiSeason::Winter:
+		{
+			return 1.0;
+		}
+	case EEDemiSeason::WinterToSpring:
+		{
+			float Divisible = (CurrentSeasonKeyFrames.SpringTime - CurrentSeasonKeyFrames.SpringStartTime)
+				.GetTotalMinutes();
+
+			float Divisor = (CurrentSeasonKeyFrames.SpringTime - CurrentDateTime)
+				.GetTotalMinutes();
+
+			return FMath::Clamp(Divisor / Divisible, 0.0f, +1.0f);
+		}
+	case EEDemiSeason::SpringToSummer:
+		{
+			float Divisible = (CurrentSeasonKeyFrames.SummerTime - CurrentSeasonKeyFrames.SummerStartTime)
+				.GetTotalMinutes();
+
+			float Divisor = (CurrentSeasonKeyFrames.SummerTime - CurrentDateTime)
+				.GetTotalMinutes();
+
+			return FMath::Clamp(Divisor / Divisible, 0.0f, +1.0f);
+		}
+	case EEDemiSeason::SummerToAutumn:
+		{
+			float Divisible = (CurrentSeasonKeyFrames.AutumnTime - CurrentSeasonKeyFrames.AutumnStartTime)
+				.GetTotalMinutes();
+
+			float Divisor = (CurrentSeasonKeyFrames.AutumnTime - CurrentDateTime)
+				.GetTotalMinutes();
+
+			return FMath::Clamp(Divisor / Divisible, 0.0f, +1.0f);
+		}
+	case EEDemiSeason::AutumnToWinter:
+		{
+			float Divisible = (CurrentSeasonKeyFrames.WinterTime - CurrentSeasonKeyFrames.WinterStartTime)
+				.GetTotalMinutes();
+
+			float Divisor = (CurrentSeasonKeyFrames.WinterTime - CurrentDateTime)
+				.GetTotalMinutes();
+
+			return FMath::Clamp(Divisor / Divisible, 0.0f, +1.0f);
+		}
+	default:
+		return 0.0f;
+	}
+}
+
 
 float AAccurateDayNightStateBase::GetGameCurrentDaySeconds() {
 	return FullDateTime.GetTimeOfDay().GetTotalSeconds();
@@ -332,6 +559,12 @@ void AAccurateDayNightStateBase::Tick(float DeltaTime)
 			EDayNightSchedule = ENewDayNightSchedule;
 			OnDayNightScheduleChangeDelegate.Broadcast(EDayNightSchedule);
 		}
+
+		ECurrentDemiSeason = DefineDemiSeason(FullDateTime, SeasonKeyFrames);
+		float DemiSeasonDelta = DefineDemiSeasonDelta(ECurrentDemiSeason, SeasonKeyFrames, FullDateTime);
+
+		// Broadcast DemiSeason enum and DemiSeason duration delta. 
+		OnSeasonChangeDelegate.Broadcast(ECurrentDemiSeason, DemiSeasonDelta);
 	}
 
 	if (Day != PreviousDay)
@@ -343,6 +576,9 @@ void AAccurateDayNightStateBase::Tick(float DeltaTime)
 
 		//FString SunsetTimeStr = SunsetTime.ToString(TEXT("%h.%m"));
 		//UE_LOG(LogTemp, Warning, TEXT("SunsetTime: %s"), *SunsetTimeStr);
+
+		FString FullDateStr = FullDateTime.ToString(TEXT("%Y.%m.%d-%H.%M.%S"));
+		UE_LOG(LogTemp, Warning, TEXT("FullDate: %s"), *FullDateStr);
 	}
 
 	OnGameStateTickDelegate.Broadcast(FullDateTime);

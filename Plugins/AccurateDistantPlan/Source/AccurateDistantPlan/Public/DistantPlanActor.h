@@ -9,6 +9,14 @@
 #include "Components/SceneComponent.h"
 #include "Components/StaticMeshComponent.h"
 
+#include "Materials/MaterialInstanceDynamic.h"
+#include "Materials/MaterialInstanceConstant.h"
+
+#include "Engine/Texture2D.h"
+
+#include "LandscapeFragment.h"
+#include "SeasonLandscapeFragment.h"
+
 #include "DistantPlanActor.generated.h"
 
 
@@ -21,33 +29,14 @@ enum class EELandscapeBackground : uint8
 	AlpineMountain_D			UMETA(DisplayName = "AlpineMountain_D"),
 	AlpineMountain_E			UMETA(DisplayName = "AlpineMountain_E"),
 
-	AfganMountain_A				UMETA(DisplayName = "AfganMountain_A"),
-	AfganMountain_B				UMETA(DisplayName = "AfganMountain_B"),
+	AfghanMountain_A			UMETA(DisplayName = "AfghanMountain_A"),
+	AfghanMountain_B			UMETA(DisplayName = "AfghanMountain_B"),
 
 	Canyon_A					UMETA(DisplayName = "Canyon_A"),
 	Canyon_B					UMETA(DisplayName = "Canyon_B"),
 	Canyon_C					UMETA(DisplayName = "Canyon_C"),
 
 	DesertDune					UMETA(DisplayName = "DesertDune"),
-
-};
-
-USTRUCT(BlueprintType)
-struct FLandscapeFragmentRules
-{
-	GENERATED_BODY()
-
-public:
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AccurateDistantPlan")
-		FVector Location;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AccurateDistantPlan")
-		FVector Scale;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AccurateDistantPlan")
-		UStaticMesh* StaticMesh;
-
 
 };
 
@@ -75,6 +64,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AccurateDistantPlan")
 		bool bLowLandscapeBackground;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AccurateDistantPlan", meta = (ClampMin = "1.0", ClampMax = "4.0", UIMin = "1.0", UIMax = "4.0"));
+		float LandscapeScale;
+
 	/* Components*/
 
 	UPROPERTY(BlueprintReadWrite, NonTransactional, meta = (Category = "AccurateDistantPlan", OverrideNativeName = "Scene"))
@@ -92,19 +84,33 @@ protected:
 
 public:	
 	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	//virtual void Tick(float DeltaTime) override;
 
 	// Called onConstruction Event
 	virtual void OnConstruction(const FTransform& Transform);
 
 protected:
 
-	void SetupFragment(UStaticMeshComponent* LandscapeFragment);
-	void MakeFragments(int8 NumFragments);
-	void SetFragmentsRules(const TArray<FLandscapeFragmentRules>& Rules);
+	void ChangeSeason(TEnumAsByte<EEDemiSeason> Season);
 
-	void SetupLandscapesRulesWithHelpers();
+	void SetupFragment(ULandscapeFragment* LandscapeFragment);
+	void MakeFragments(const TArray<FLandscapeFragmentRules>& RulesList);
+	void MakeSeasonFragments(const TArray<FLandscapeFragmentRules>& RulesList);
+	
+	void SetupLandscapesRules();
+	void SetupLandscapesRulesLowPoly();
 	TArray<FLandscapeFragmentRules> MakeAlpineMountain(FString Path, FString Id);
+	TArray<FLandscapeFragmentRules> MakeAfghanMountain(FString Path, FString Id);
+	TArray<FLandscapeFragmentRules> MakeCanyon(FString Path, FString Id);
+	TArray<FLandscapeFragmentRules> MakeDesert(FString Path);
+
+	TArray<FLandscapeFragmentRules> MakeAlpineMountainLowPoly(FString Path, FString Id);
+	TArray<FLandscapeFragmentRules> MakeAfghanMountainLowPoly(FString Path, FString Id);
+	TArray<FLandscapeFragmentRules> MakeCanyonLowPoly(FString Path, FString Id);
+	TArray<FLandscapeFragmentRules> MakeDesertLowPoly(FString Path);
+
+	void BindMountainTextures(TArray<FLandscapeFragmentRules>& FragmentRules, FString Path, FString Id);
+
 	TArray<FLandscapeFragmentRules> MakeLandscapeFragments(FString Path, const TArray<FString>& FragmentUrls);
 	void ClearScene();
 
@@ -113,8 +119,15 @@ private:
 	void RedrawLandscape(TEnumAsByte<EELandscapeBackground> CurrentLandscape, bool LowMode);
 
 	TMap<TEnumAsByte<EELandscapeBackground>, TArray<FLandscapeFragmentRules>> LandscapeFragmentsRules;
+	TMap<TEnumAsByte<EELandscapeBackground>, TArray<FLandscapeFragmentRules>> LandscapeFragmentsRulesLowPoly;
+
+	TArray<ULandscapeFragment*> LandscapeFragments;
 
 	AAccurateDayNightStateBase* GameState;
 	AAccurateDayNightStateBase* GetGameState() const;
+
+
+
+	TEnumAsByte<EEDemiSeason> CurrentSeason;
 
 };

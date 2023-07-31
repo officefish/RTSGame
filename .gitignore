@@ -70,5 +70,8 @@ Saved/*
 Intermediate/*
 Plugins/*/Intermediate/*
 
+# Landscape content
+Content/PhotoR_Backgrounds/*
+
 # Cache files for the editor to use
 DerivedDataCache/*

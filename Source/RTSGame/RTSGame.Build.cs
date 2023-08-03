@@ -15,9 +15,13 @@ public class RTSGame : ModuleRules
 		);
 
 		PublicDependencyModuleNames.AddRange(new string[] { 
-			"Core", "CoreUObject", "Engine", "InputCore", 
+			"Core", 
+			"CoreUObject", 
+			"Engine", 
+			"InputCore", 
 			"RTSSmoothCamera",
 			"AccurateDayNight",
+			"CultureGameState",
 			"SunPosition",
 		});
 

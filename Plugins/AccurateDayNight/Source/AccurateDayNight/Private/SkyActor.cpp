@@ -87,8 +87,6 @@ void ASkyActor::ConstructSubObjects()
 {
 	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
 
-	//SunDirectionalLight = CreateDefaultSubobject<UDirectionalLightComponent>(TEXT("DirectionalLight"));
-
 	SkyLight = CreateDefaultSubobject<USkyLightComponent>(TEXT("SkyLight"));
 	SkyAtmosphere = CreateDefaultSubobject<USkyAtmosphereComponent>(TEXT("SkyAtmosphere"));
 
@@ -143,9 +141,9 @@ void ASkyActor::SetupSubObjects()
 	SetMoonRules(MoonRules);
 }
 
-AAccurateDayNightStateBase* ASkyActor::GetGameState() const {
+ACultureGameStateBase* ASkyActor::GetGameState() const {
 	return ::IsValid(GetWorld()) ?
-		GetWorld()->GetGameState<AAccurateDayNightStateBase>()
+		GetWorld()->GetGameState<ACultureGameStateBase>()
 		: nullptr;
 }
 
@@ -157,6 +155,7 @@ void ASkyActor::BeginPlay()
 	GameState = GetGameState();
 
 	if (::IsValid(GameState)) {
+		
 		GameState->OnGameStateTickDelegate.AddDynamic(this, &ASkyActor::OnGameStateTick);
 		GameState->OnDayNightCycleChangeDelegate.AddDynamic(this, &ASkyActor::OnDayNightCycleChange);
 		GameState->OnNewDayDelegate.AddDynamic(this, &ASkyActor::OnNextDay);

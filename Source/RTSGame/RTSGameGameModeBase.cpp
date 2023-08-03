@@ -22,8 +22,8 @@ void ARTSGameGameModeBase::SetupDefaults()
 	/* Set RTSSmoothCameraPawn as default */
 	DefaultPawnClass = AAccurateDayNightPawn::StaticClass();
 
-	/* Set AccurateDayNightStateBase as default */
-	GameStateClass = AAccurateDayNightStateBase::StaticClass();
+	/* Set CultureStateBase as default */
+	GameStateClass = ACultureGameStateBase::StaticClass();
 
 
 }

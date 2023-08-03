@@ -4,9 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+
+#include "CultureGameStateBase.h"
+
 #include "AccurateDayNightPawn.h"
-#include "AccurateDayNightStateBase.h"
 #include "RTSPlayerController.h"
+
 #include "RTSGameGameModeBase.generated.h"
 
 /**

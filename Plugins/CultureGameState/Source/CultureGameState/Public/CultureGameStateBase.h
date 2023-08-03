@@ -4,11 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameStateBase.h"
+
 #include "Misc/DateTime.h"
 #include "Misc/Timespan.h"
 #include "Math/UnrealMathUtility.h"
-#include "AccurateDayNightStateBase.generated.h"
 
+#include "CultureGameStateBase.generated.h"
+
+/* Season KeyFrames */
 USTRUCT(BlueprintType)
 struct FDemiSeasonKeyFrames
 {
@@ -42,6 +45,7 @@ public:
 
 };
 
+/* Demi Seasons Enum */
 UENUM(BlueprintType)
 enum class EEDemiSeason : uint8
 {
@@ -55,6 +59,7 @@ enum class EEDemiSeason : uint8
 	Winter					UMETA(DisplayName = "Winter"),
 };
 
+/* Game Speed Enum */
 UENUM(BlueprintType)
 enum class EEGameSpeed : uint8
 {
@@ -68,6 +73,7 @@ enum class EEGameSpeed : uint8
 	GameTimeX500	UMETA(DisplayName = "GameTimeX500"),
 };
 
+/* Night Circle Enum */
 UENUM(BlueprintType)
 enum class EEDayNightCicle : uint8
 {
@@ -79,6 +85,7 @@ enum class EEDayNightCicle : uint8
 	DayStart				UMETA(DisplayName = "DayStart"),
 };
 
+/* Day / Night Shedule Enum */
 UENUM(BlueprintType)
 enum class EEDayNightSchedule : uint8
 {
@@ -92,29 +99,29 @@ enum class EEDayNightSchedule : uint8
 	LateEvening		UMETA(DisplayName = "LateEvening"),
 };
 
+/* Dynamic multicast */
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDayNightCicleDelegate, TEnumAsByte<EEDayNightCicle>, EDayNightCycle);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDayNightScheduleDelegate, TEnumAsByte<EEDayNightSchedule>, EDayNightSchedule);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGameSpeedDelegate, TEnumAsByte<EEGameSpeed>, EGameSpeed);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGameStateTickDelegate, FDateTime, TickDateTime);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDemiSeasonDelegate, 
-	TEnumAsByte<EEDemiSeason>, Season,
-	float, Delta);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDemiSeasonDelegate,
+TEnumAsByte<EEDemiSeason>, Season,
+float, Delta);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FNewDayDelegate);
 
-/**
- * 
- */
 UCLASS()
-class ACCURATEDAYNIGHT_API AAccurateDayNightStateBase : public AGameStateBase
+class CULTUREGAMESTATE_API ACultureGameStateBase : public AGameStateBase
 {
 	GENERATED_BODY()
 
-	AAccurateDayNightStateBase();
+	ACultureGameStateBase();
 
 public:
 
+	/* Functions */
 	UFUNCTION(BlueprintCallable, Category = "GameDatetime")
 		void GameSpeedUp();
 
@@ -139,8 +146,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "AccurateDayNight")
 		void SetGameStartDateTime(const FDateTime& DateTime);
 
-
-	// Day/Night Transition Setup
+	//// Day/Night Transition Setup
 	UFUNCTION(BlueprintCallable, Category = "GameDatetime")
 		void SetDayNightTransitionTime(int32 Hour, int32 Minute);
 
@@ -169,16 +175,8 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "AccurateDayNight")
 		FGameStateTickDelegate OnGameStateTickDelegate;
 
-	// Delegates
 	UPROPERTY(BlueprintAssignable, Category = "AccurateDayNight")
 		FDemiSeasonDelegate OnSeasonChangeDelegate;
-
-	// DayNightCicle
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AccurateDayNight")
-		FTimespan SunsetTime;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AccurateDayNight")
-		FTimespan SunriseTime;
 
 	// Enums
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AccurateDayNight")
@@ -193,14 +191,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AccurateDayNight")
 		TEnumAsByte<EEDayNightSchedule> EDayNightSchedule;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AccurateDayNight")
-		FDateTime FullDateTime;
+	/* Game time mode flags */
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AccurateDayNight")
 		bool bWithDayNightCycle;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AccurateDayNight")
-		FDateTime GameStartDatetime;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AccurateDayNight")
 		bool bWithSlowMotion;
@@ -214,22 +208,37 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AccurateDayNight")
 		bool bWithX500Time;
 
+	// Day Night Cicle
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AccurateDayNight")
+		FTimespan SunsetTime;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AccurateDayNight")
+		FTimespan SunriseTime;
+
 	/* Day/Night Transition Time */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AccurateDayNight")
 		FTimespan DayNightTransitionTime;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AccurateDayNight")
+		FDateTime FullDateTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AccurateDayNight")
+		FDateTime GameStartDatetime;
 
 private:
+
+	FDemiSeasonKeyFrames CalculateSeasonKeyFrames(FDateTime StartDateTime);
 
 	float GetTimeMuliplier();
 
 	TEnumAsByte<EEDayNightCicle> DefineDayNightCycle(const int32& NumMinutes);
-	
+
 	TEnumAsByte<EEDayNightSchedule> DefineDayNightSchedule(const int32& NumHours);
 
 	TEnumAsByte<EEDemiSeason> DefineDemiSeason(const FDateTime& CurrentDateTime, const FDemiSeasonKeyFrames& KeyFrames);
 
 	FDemiSeasonKeyFrames GetCurrentDemiSeasonKeyFrames(
-		const FDateTime& CurrentDateTime, const FTimespan& Inconstancy, const FTimespan& NumDays );
+		const FDateTime& CurrentDateTime, const FTimespan& Inconstancy, const FTimespan& NumDays);
 
 	float DefineDemiSeasonDelta(
 		TEnumAsByte<EEDemiSeason> CurrentSeason,
@@ -245,14 +254,12 @@ protected:
 private:
 
 	/* Season pass Keyframes  */
-
 	FDemiSeasonKeyFrames SeasonKeyFrames;
 	FTimespan DemiSeasonNumDays;
 	FTimespan DemiSeasonInconstancy;
 
-
 	/* GameSpeed modes multiplier */
-	
+
 	float GameTimeMultiplier;
 	float GameTimeMultiplierX2;
 	float GameTimeMultiplierX5;
@@ -264,5 +271,6 @@ private:
 	FDateTime GameStartDateTime;
 	FTimespan TimePasses;
 
-	float TotalSeconds;	
+	float TotalSeconds;
+
 };

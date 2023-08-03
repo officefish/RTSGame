@@ -38,7 +38,8 @@ public class AccurateDistantPlan : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				"AccurateDayNight"
+				"AccurateDayNight",
+				"CultureGameState"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

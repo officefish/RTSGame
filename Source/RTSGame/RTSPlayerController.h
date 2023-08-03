@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "AccurateDayNightStateBase.h"
+
+#include "CultureGameStateBase.h"
 #include "AccurateDayNightPawn.h"
+
 #include "RTSPlayerController.generated.h"
 
 /**
@@ -32,5 +34,5 @@ protected:
 
 private:
 	
-	AAccurateDayNightStateBase* GetGameState() const;
+	ACultureGameStateBase* GetGameState() const;
 };

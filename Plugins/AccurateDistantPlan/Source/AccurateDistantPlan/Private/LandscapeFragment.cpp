@@ -32,9 +32,7 @@ ULandscapeFragment::ULandscapeFragment()
 	MeshComponent->BodyInstance.bAutoWeld = false;
 	MeshComponent->SetGenerateOverlapEvents(false);
 
-	//FString WinterSource = FString();
-	//ConstructorHelpers::FObjectFinder<UMaterial> WinterMaterialFound(TEXT("/Game/PhotoR_Backgrounds/Materials/Mountain_Winter/pr_background_mountain_a_M_winter"));
-
+	
 	//if (WinterMaterialFound.Succeeded())
 	//{
 		//WinterMaterial = WinterMaterialFound.Object;
@@ -62,9 +60,9 @@ void ULandscapeFragment::SetRules(FLandscapeFragmentRules Rules)
 		MeshComponent->RegisterComponent();
 	}
 
-	// Setup rules textures
 	LandscapeRules = Rules;
-	//if (Rules.)
+	
+	SetRulesAdditions();
 
 }
 
@@ -73,16 +71,4 @@ void ULandscapeFragment::SetLandscapeScale(float LandscapeScale)
 	MeshComponent->SetWorldScale3D(FVector(LandscapeScale));
 }
 
-
-void ULandscapeFragment::ChangeSeason(TEnumAsByte<EEDemiSeason> Season)
-{
-	UE_LOG(LogTemp, Warning, TEXT("ChangeSeason"));
-
-	
-}
-
-void ULandscapeFragment::SmoothChangeSeason(float Delta)
-{
-
-}
 

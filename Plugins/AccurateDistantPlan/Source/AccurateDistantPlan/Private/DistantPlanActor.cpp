@@ -37,11 +37,10 @@ ADistantPlanActor::ADistantPlanActor()
 }
 
 
-
-
-AAccurateDayNightStateBase* ADistantPlanActor::GetGameState() const {
+ACultureGameStateBase* ADistantPlanActor::GetGameState() const 
+{
 	return ::IsValid(GetWorld()) ?
-		GetWorld()->GetGameState<AAccurateDayNightStateBase>()
+		GetWorld()->GetGameState<ACultureGameStateBase>()
 		: nullptr;
 }
 
@@ -79,11 +78,21 @@ void ADistantPlanActor::OnSeasonChange(TEnumAsByte<EEDemiSeason> Season, float D
 		}
 	}
 
-	//if (CurrentSeason != Season) 
-	//{
+	if (CurrentSeason != Season) 
+	{
 		CurrentSeason = Season;
 		ChangeSeason(CurrentSeason);
-	//}
+	}
+
+	switch (Season)
+	{
+	case EEDemiSeason::WinterToSpring:
+	case EEDemiSeason::AutumnToWinter:
+	case EEDemiSeason::SpringToSummer:
+	case EEDemiSeason::SummerToAutumn:
+		SmoothChangeSeason(Delta);
+		break;
+	}
 }
 
 void ADistantPlanActor::ChangeSeason(TEnumAsByte<EEDemiSeason> Season)
@@ -96,27 +105,41 @@ void ADistantPlanActor::ChangeSeason(TEnumAsByte<EEDemiSeason> Season)
 
 	for (USceneComponent* Child : SceneChildren) 
 	{
-		ULandscapeFragment* Fragment = static_cast<ULandscapeFragment*>(Child);
-		if (Fragment != nullptr)
+		USeasonLandscapeFragment* Fragment = static_cast<USeasonLandscapeFragment*>(Child);
+		if (::IsValid(Fragment))
 		{
 			Fragment->ChangeSeason(CurrentSeason);
 		}
-		
-
-			//Fragment->SmoothChangeSeason(float Delta);
-		
 	}
-
 }
 
+//
+void ADistantPlanActor::SmoothChangeSeason(float Delta)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Smooth Change Season!"));
+	UE_LOG(LogTemp, Warning, TEXT("Smooth Change Season delta: %f"), Delta);
 
+	//UE_LOG(LogTemp, Warning, TEXT("LandscapeFragments.Num: %d"), LandscapeFragments.Num());
+	TArray<USceneComponent*> SceneChildren;
+	Scene->GetChildrenComponents(false, SceneChildren);
+
+	for (USceneComponent* Child : SceneChildren)
+	{
+		USeasonLandscapeFragment* Fragment = static_cast<USeasonLandscapeFragment*>(Child);
+		if (::IsValid(Fragment))
+		{
+			Fragment->SmoothChangeSeason(Delta);
+		}
+	}
+}
+
+//
 void ADistantPlanActor::OnConstruction(const FTransform& Transform)
 {
 	RedrawLandscape(ELandscapeBackground, bLowLandscapeBackground);
 }
 
-
-
+//
 void ADistantPlanActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -258,14 +281,11 @@ void ADistantPlanActor::RedrawLandscape(TEnumAsByte<EELandscapeBackground> Curre
 void ADistantPlanActor::ClearScene() {
 
 	/* Destroy Scene Children */
-
-	//LandscapeFragments.Empty();
-
 	TArray<USceneComponent*> SceneChildren;
 	Scene->GetChildrenComponents(true, SceneChildren);
 
-	for (USceneComponent* Child : SceneChildren) {
-
+	for (USceneComponent* Child : SceneChildren) 
+	{
 		UE_LOG(LogTemp, Warning, TEXT("Destroing static mesh fragment..."));
 		Child->DestroyComponent();
 	}
@@ -279,7 +299,6 @@ void ADistantPlanActor::SetupFragment(ULandscapeFragment* LandscapeFragment)
 	LandscapeFragment->AttachToComponent(Scene, FAttachmentTransformRules::KeepRelativeTransform);
 	LandscapeFragment->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 	LandscapeFragment->SetWorldScale3D(FVector(1.0f));
-
 }
 
 void ADistantPlanActor::MakeFragments(const TArray<FLandscapeFragmentRules>& RulesList)
@@ -323,16 +342,13 @@ void ADistantPlanActor::MakeSeasonFragments(const TArray<FLandscapeFragmentRules
 		}
 	}
 
-	
 }
 
-
-
+//
 void  ADistantPlanActor::SetupLandscapesRules()
 {
 	
 	FString MOUNTAIN_PATH = "/Game/PhotoR_Backgrounds/Meshes/360d_Horizon";
-
 	FString MOUNTAIN_TEXTURE_PATH = "/Game/PhotoR_Backgrounds/Textures";
 
 	/* Alpine Mountain Variants */
@@ -390,7 +406,6 @@ void  ADistantPlanActor::SetupLandscapesRules()
 void ADistantPlanActor::SetupLandscapesRulesLowPoly()
 {
 	FString MOUNTAIN_PATH = "/Game/PhotoR_Backgrounds/Meshes/360d_Horizon";
-
 	FString MOUNTAIN_TEXTURE_PATH = "/Game/PhotoR_Backgrounds/Textures";
 
 	/* Alpine Mountain Variants */
@@ -470,7 +485,6 @@ void  ADistantPlanActor::BindMountainTextures(
 	FString Spring_BC_Snow_Source = FString::Format(TEXT("{0}/SM_snow_a_d"), Args);
 	ConstructorHelpers::FObjectFinder<UTexture2D> Spring_BC_Snow_Found(*Spring_BC_Snow_Source);
 
-
 	// Summer Textures 
 	FString Summer_BC_Red_1_Source = FString::Format(TEXT("{0}/SM_grass_c_d"), Args);
 	ConstructorHelpers::FObjectFinder<UTexture2D> Summer_BC_Red_1_Found(*Summer_BC_Red_1_Source);
@@ -525,7 +539,7 @@ void  ADistantPlanActor::BindMountainTextures(
 	FString Spring_Normal_Snow_Source = FString::Format(TEXT("{0}/SM_snow_a_n"), Args);
 	ConstructorHelpers::FObjectFinder<UTexture2D> Spring_Normal_Snow_Found(*Spring_Normal_Snow_Source);
 
-	//// Summer Normals 
+	// Summer Normals 
 
 	FString Summer_Normal_Red_1_Source = FString::Format(TEXT("{0}/grass_fall_a_n"), Args);
 	ConstructorHelpers::FObjectFinder<UTexture2D> Summer_Normal_Red_1_Found(*Summer_Normal_Red_1_Source);
@@ -753,10 +767,6 @@ void  ADistantPlanActor::BindMountainTextures(
 			Rules.Winter_Splat_T = Winter_Splat_Found.Object;
 		}
 	}
-
-	
-
-	
 }
 
 /* Landscape Fragment Rules Makers*/

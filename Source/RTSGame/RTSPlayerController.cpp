@@ -21,7 +21,7 @@ void ARTSPlayerController::PostEditChangeProperty(FPropertyChangedEvent& Propert
    
     if (PropName == GET_MEMBER_NAME_CHECKED(ARTSPlayerController, bDebugMode))
     {
-        AAccurateDayNightStateBase* GameState = GetGameState();
+        ACultureGameStateBase* GameState = GetGameState();
 
         if (::IsValid(GameState) == false) return;
 
@@ -48,8 +48,8 @@ void ARTSPlayerController::PostEditChangeProperty(FPropertyChangedEvent& Propert
     }
 }
 
-AAccurateDayNightStateBase* ARTSPlayerController::GetGameState() const
+ACultureGameStateBase* ARTSPlayerController::GetGameState() const
 {
-    return GetWorld() != NULL ? GetWorld()->GetGameState<AAccurateDayNightStateBase>() : NULL;
+    return GetWorld() != NULL ? GetWorld()->GetGameState<ACultureGameStateBase>() : NULL;
 }
 

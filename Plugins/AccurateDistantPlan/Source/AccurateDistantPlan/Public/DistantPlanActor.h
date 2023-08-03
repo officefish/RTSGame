@@ -4,7 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "AccurateDayNightStateBase.h"
+
+#include "CultureGameStateBase.h"
 
 #include "Components/SceneComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -92,6 +93,7 @@ public:
 protected:
 
 	void ChangeSeason(TEnumAsByte<EEDemiSeason> Season);
+	void SmoothChangeSeason(float Delta);
 
 	void SetupFragment(ULandscapeFragment* LandscapeFragment);
 	void MakeFragments(const TArray<FLandscapeFragmentRules>& RulesList);
@@ -123,10 +125,8 @@ private:
 
 	TArray<ULandscapeFragment*> LandscapeFragments;
 
-	AAccurateDayNightStateBase* GameState;
-	AAccurateDayNightStateBase* GetGameState() const;
-
-
+	ACultureGameStateBase* GameState;
+	ACultureGameStateBase* GetGameState() const;
 
 	TEnumAsByte<EEDemiSeason> CurrentSeason;
 

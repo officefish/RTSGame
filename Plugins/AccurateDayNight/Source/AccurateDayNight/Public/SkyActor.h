@@ -28,7 +28,7 @@
 #include "CompassComponent.h"
 #include "AccurateDayNightRules.h"
 
-#include "AccurateDayNightStateBase.h"
+#include "CultureGameStateBase.h"
 
 #include "SunPosition.h"
 #include "SkyActor.generated.h"
@@ -166,7 +166,7 @@ public:
 private:
 
 	// GameState pointer 
-	AAccurateDayNightStateBase* ASkyActor::GetGameState() const;
+	ACultureGameStateBase* ASkyActor::GetGameState() const;
 	void UpdateGameStateData();
 
 	void SetupDefaults();
@@ -221,7 +221,7 @@ private:
 	bool bOnNightBegin;
 	bool bOnDayBegin;
 
-	AAccurateDayNightStateBase* GameState;
+	ACultureGameStateBase* GameState;
 	TEnumAsByte<EEDayNightCicle> ECurrentDayNightCicle;
 
 	FDateTime TickDateTime;

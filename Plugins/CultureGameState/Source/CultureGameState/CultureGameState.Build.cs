@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class AccurateDayNight : ModuleRules
+public class CultureGameState : ModuleRules
 {
-	public AccurateDayNight(ReadOnlyTargetRules Target) : base(Target)
+	public CultureGameState(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		
@@ -38,8 +38,6 @@ public class AccurateDayNight : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				"SunPosition",
-				"CultureGameState"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

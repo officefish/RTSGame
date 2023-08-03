@@ -1,10 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "CultureGameStateBase.h"
 
-#include "AccurateDayNightStateBase.h"
-
-
-AAccurateDayNightStateBase::AAccurateDayNightStateBase()
+ACultureGameStateBase::ACultureGameStateBase()
 	: AGameStateBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -24,6 +22,9 @@ AAccurateDayNightStateBase::AAccurateDayNightStateBase()
 	SetGameTimeMultiplier(60.0f);
 	SetGameStartDateTime(FDateTime::UtcNow());
 
+	//
+	SeasonKeyFrames = CalculateSeasonKeyFrames(GameStartDateTime);
+
 	SunriseTime = FTimespan::FromHours(8.0f);
 	SunsetTime = FTimespan::FromHours(21.0f);
 
@@ -33,13 +34,12 @@ AAccurateDayNightStateBase::AAccurateDayNightStateBase()
 
 	/*Setup default DemiSeason entities */
 
-	
-
 }
 
-FDemiSeasonKeyFrames AAccurateDayNightStateBase::GetCurrentDemiSeasonKeyFrames(
+//
+FDemiSeasonKeyFrames ACultureGameStateBase::GetCurrentDemiSeasonKeyFrames(
 	const FDateTime& CurrentDateTime,
-	const FTimespan& Inconstancy, 
+	const FTimespan& Inconstancy,
 	const FTimespan& NumDays
 )
 {
@@ -72,9 +72,9 @@ FDemiSeasonKeyFrames AAccurateDayNightStateBase::GetCurrentDemiSeasonKeyFrames(
 	/*Make demi season start frames */
 
 	/* ... Spring frames */
-	FDateTime SpringStartDateTime{ CurrentDateTime.GetYear(), 1, 1 };	
+	FDateTime SpringStartDateTime{ CurrentDateTime.GetYear(), 1, 1 };
 	SpringStartDateTime += SpringStartTimespan;
-	
+
 	CurrentSeasonKeyFrames.SpringStartTime = SpringStartDateTime;
 	CurrentSeasonKeyFrames.SpringTime = SpringStartDateTime + NumDays;
 
@@ -137,27 +137,30 @@ FDemiSeasonKeyFrames AAccurateDayNightStateBase::GetCurrentDemiSeasonKeyFrames(
 
 }
 
-void AAccurateDayNightStateBase::SetGameSpeed(TEnumAsByte<EEGameSpeed> EGameSpeedStatus)
+//
+void ACultureGameStateBase::SetGameSpeed(TEnumAsByte<EEGameSpeed> EGameSpeedStatus)
 {
 	EGameSpeed = EGameSpeedStatus;
 	OnGameSpeedChangeDelegate.Broadcast(EGameSpeed);
 }
+//
 
-void AAccurateDayNightStateBase::SetGameTimeMultiplier(float Value)
+void ACultureGameStateBase::SetGameTimeMultiplier(float Value)
 {
 	GameTimeMultiplier = Value;
 	GameTimeMultiplierX2 = Value * 2;
-	GameTimeMultiplierX5 = Value * 5;
-	GameTimeMultiplierX50 = Value * 50;
+	GameTimeMultiplierX5 = Value * 5;	GameTimeMultiplierX50 = Value * 50;
 	GameTimeMultiplierX500 = Value * 500;
 }
 
-float AAccurateDayNightStateBase::GetGameTimeMultiplier()
+//
+float ACultureGameStateBase::GetGameTimeMultiplier()
 {
 	return GameTimeMultiplier;
 }
 
-void AAccurateDayNightStateBase::SetGameStartDateTime(const FDateTime& DateTime)
+//
+void ACultureGameStateBase::SetGameStartDateTime(const FDateTime& DateTime)
 {
 	GameStartDateTime = DateTime;
 
@@ -166,15 +169,20 @@ void AAccurateDayNightStateBase::SetGameStartDateTime(const FDateTime& DateTime)
 	TimePasses = FTimespan(0, 0, 0, 0);
 	FullDateTime = DateTime;
 	TotalSeconds = 0.0f;
-
-	// Calculate Demi season keyframes
-	SeasonKeyFrames = GetCurrentDemiSeasonKeyFrames(
-		GameStartDateTime, DemiSeasonInconstancy, DemiSeasonNumDays);
 }
 
+//
+FDemiSeasonKeyFrames ACultureGameStateBase::CalculateSeasonKeyFrames(FDateTime StartDateTime)
+{
+	// Calculate Demi season keyframes
+	FDemiSeasonKeyFrames KeyFrames = GetCurrentDemiSeasonKeyFrames(
+		StartDateTime, DemiSeasonInconstancy, DemiSeasonNumDays);
 
+	return KeyFrames;
+}
 
-float AAccurateDayNightStateBase::GetTimeMuliplier()
+//
+float ACultureGameStateBase::GetTimeMuliplier()
 {
 	if (EGameSpeed == EEGameSpeed::Pause) {
 		return 0.0f;
@@ -202,8 +210,8 @@ float AAccurateDayNightStateBase::GetTimeMuliplier()
 	}
 }
 
-
-void AAccurateDayNightStateBase::GameSpeedUp()
+//
+void ACultureGameStateBase::GameSpeedUp()
 {
 	bool bNeedBroadcast = true;
 
@@ -265,7 +273,8 @@ void AAccurateDayNightStateBase::GameSpeedUp()
 	}
 }
 
-void AAccurateDayNightStateBase::GameSpeedDown()
+//
+void ACultureGameStateBase::GameSpeedDown()
 {
 	bool bNeedBroadcast = true;
 	if (EGameSpeed == EEGameSpeed::GameTimeX500) {
@@ -316,7 +325,8 @@ void AAccurateDayNightStateBase::GameSpeedDown()
 	}
 }
 
-TEnumAsByte<EEDayNightCicle> AAccurateDayNightStateBase::DefineDayNightCycle(const int32& NumMinutes)
+//
+TEnumAsByte<EEDayNightCicle> ACultureGameStateBase::DefineDayNightCycle(const int32& NumMinutes)
 {
 	int32 TransitionMinures = DayNightTransitionTime.GetHours() * 60 + DayNightTransitionTime.GetMinutes();
 	int32 SunsetMinutes = SunsetTime.GetHours() * 60 + SunsetTime.GetMinutes();
@@ -363,7 +373,8 @@ TEnumAsByte<EEDayNightCicle> AAccurateDayNightStateBase::DefineDayNightCycle(con
 	}
 }
 
-TEnumAsByte<EEDayNightSchedule> AAccurateDayNightStateBase::DefineDayNightSchedule(const int32& NumHours)
+//
+TEnumAsByte<EEDayNightSchedule> ACultureGameStateBase::DefineDayNightSchedule(const int32& NumHours)
 {
 	if (NumHours < 3) {
 		return EEDayNightSchedule::Night;
@@ -394,7 +405,8 @@ TEnumAsByte<EEDayNightSchedule> AAccurateDayNightStateBase::DefineDayNightSchedu
 	}
 }
 
-TEnumAsByte<EEDemiSeason> AAccurateDayNightStateBase::DefineDemiSeason(
+//
+TEnumAsByte<EEDemiSeason> ACultureGameStateBase::DefineDemiSeason(
 	const FDateTime& CurrentDateTime, const FDemiSeasonKeyFrames& KeyFrames)
 {
 	//UE_LOG()
@@ -445,79 +457,83 @@ TEnumAsByte<EEDemiSeason> AAccurateDayNightStateBase::DefineDemiSeason(
 	}
 }
 
-float AAccurateDayNightStateBase::DefineDemiSeasonDelta(
+//
+float ACultureGameStateBase::DefineDemiSeasonDelta(
 	TEnumAsByte<EEDemiSeason> CurrentSeason,
 	const FDemiSeasonKeyFrames& CurrentSeasonKeyFrames,
 	const FDateTime& CurrentDateTime)
 {
 	switch (CurrentSeason) {
 	case EEDemiSeason::Spring:
-		{
-			return 1.0;
-		}
+	{
+		return 1.0;
+	}
 	case EEDemiSeason::Summer:
-		{
-			return 1.0;
-		}
+	{
+		return 1.0;
+	}
 	case EEDemiSeason::Autumn:
-		{
-			return 1.0;
-		}
+	{
+		return 1.0;
+	}
 	case EEDemiSeason::Winter:
-		{
-			return 1.0;
-		}
+	{
+		return 1.0;
+	}
 	case EEDemiSeason::WinterToSpring:
-		{
-			float Divisible = (CurrentSeasonKeyFrames.SpringTime - CurrentSeasonKeyFrames.SpringStartTime)
-				.GetTotalMinutes();
+	{
+		float Divisible = (CurrentSeasonKeyFrames.SpringTime - CurrentSeasonKeyFrames.SpringStartTime)
+			.GetTotalMinutes();
 
-			float Divisor = (CurrentSeasonKeyFrames.SpringTime - CurrentDateTime)
-				.GetTotalMinutes();
+		float Divisor = (CurrentSeasonKeyFrames.SpringTime - CurrentDateTime)
+			.GetTotalMinutes();
 
-			return FMath::Clamp(Divisor / Divisible, 0.0f, +1.0f);
-		}
+		return FMath::Clamp(Divisor / Divisible, 0.0f, +1.0f);
+	}
 	case EEDemiSeason::SpringToSummer:
-		{
-			float Divisible = (CurrentSeasonKeyFrames.SummerTime - CurrentSeasonKeyFrames.SummerStartTime)
-				.GetTotalMinutes();
+	{
+		float Divisible = (CurrentSeasonKeyFrames.SummerTime - CurrentSeasonKeyFrames.SummerStartTime)
+			.GetTotalMinutes();
 
-			float Divisor = (CurrentSeasonKeyFrames.SummerTime - CurrentDateTime)
-				.GetTotalMinutes();
+		float Divisor = (CurrentSeasonKeyFrames.SummerTime - CurrentDateTime)
+			.GetTotalMinutes();
 
-			return FMath::Clamp(Divisor / Divisible, 0.0f, +1.0f);
-		}
+		return FMath::Clamp(Divisor / Divisible, 0.0f, +1.0f);
+	}
 	case EEDemiSeason::SummerToAutumn:
-		{
-			float Divisible = (CurrentSeasonKeyFrames.AutumnTime - CurrentSeasonKeyFrames.AutumnStartTime)
-				.GetTotalMinutes();
+	{
+		float Divisible = (CurrentSeasonKeyFrames.AutumnTime - CurrentSeasonKeyFrames.AutumnStartTime)
+			.GetTotalMinutes();
 
-			float Divisor = (CurrentSeasonKeyFrames.AutumnTime - CurrentDateTime)
-				.GetTotalMinutes();
+		float Divisor = (CurrentSeasonKeyFrames.AutumnTime - CurrentDateTime)
+			.GetTotalMinutes();
 
-			return FMath::Clamp(Divisor / Divisible, 0.0f, +1.0f);
-		}
+		return FMath::Clamp(Divisor / Divisible, 0.0f, +1.0f);
+	}
 	case EEDemiSeason::AutumnToWinter:
-		{
-			float Divisible = (CurrentSeasonKeyFrames.WinterTime - CurrentSeasonKeyFrames.WinterStartTime)
-				.GetTotalMinutes();
+	{
+		float Divisible = (CurrentSeasonKeyFrames.WinterTime - CurrentSeasonKeyFrames.WinterStartTime)
+			.GetTotalMinutes();
 
-			float Divisor = (CurrentSeasonKeyFrames.WinterTime - CurrentDateTime)
-				.GetTotalMinutes();
+		float Divisor = (CurrentSeasonKeyFrames.WinterTime - CurrentDateTime)
+			.GetTotalMinutes();
 
-			return FMath::Clamp(Divisor / Divisible, 0.0f, +1.0f);
-		}
+		return FMath::Clamp(Divisor / Divisible, 0.0f, +1.0f);
+	}
 	default:
 		return 0.0f;
 	}
 }
 
-
-float AAccurateDayNightStateBase::GetGameCurrentDaySeconds() {
+//
+float ACultureGameStateBase::GetGameCurrentDaySeconds() 
+{
 	return FullDateTime.GetTimeOfDay().GetTotalSeconds();
 }
 
-float AAccurateDayNightStateBase::GetGameSolarTime() {
+//
+float ACultureGameStateBase::GetGameSolarTime() 
+{
 	float result = FullDateTime.GetHour();
 	result += FullDateTime.GetMinute() / NUM_MINUTES;
 	result += FullDateTime.GetSecond() / NUM_SECONDS;
@@ -525,7 +541,28 @@ float AAccurateDayNightStateBase::GetGameSolarTime() {
 	return result;
 }
 
-void AAccurateDayNightStateBase::Tick(float DeltaTime)
+
+//
+void ACultureGameStateBase::SetDayNightTransitionTime(int32 Hour, int32 Minute)
+{
+	float Value = (float)Minute + Hour * 60.0f;
+	if (Value >= 120.0f) {
+		UE_LOG(LogTemp, Warning, 
+			TEXT("No effect function call: SetDayNightTransitionTime. Day/Night transition time can not be more than 120 minutes. "));
+		return;
+	}
+
+	DayNightTransitionTime = FTimespan::FromMinutes(Value);
+}
+
+//
+FTimespan ACultureGameStateBase::GetDayNightTransitionTime() 
+{
+	return DayNightTransitionTime;
+}
+
+//
+void ACultureGameStateBase::Tick(float DeltaTime)
 {
 	float DeltaTimeMyltiply = DeltaTime * GetTimeMuliplier();
 	TimePasses += FTimespan::FromSeconds(DeltaTimeMyltiply);
@@ -541,30 +578,37 @@ void AAccurateDayNightStateBase::Tick(float DeltaTime)
 	int32 NumMinutes = NumHour * 60 + FullDateTime.GetMinute();
 	int32 Day = FullDateTime.GetDay();
 
-	if (PreviousMinutes != NumMinutes && bWithDayNightCycle) {
+	if (PreviousMinutes != NumMinutes && bWithDayNightCycle) 
+	{
 
 		TEnumAsByte<EEDayNightCicle> ENewDayNightCycle = DefineDayNightCycle(NumMinutes);
 
-		if (ENewDayNightCycle != EDayNightCycle) {
+		if (ENewDayNightCycle != EDayNightCycle) 
+		{
 			EDayNightCycle = ENewDayNightCycle;
 			OnDayNightCycleChangeDelegate.Broadcast(EDayNightCycle);
 		}
 	}
 
-	if (NumHour != PreviousHour) {
+	if (NumHour != PreviousHour) 
+	{
 
 		TEnumAsByte<EEDayNightSchedule> ENewDayNightSchedule = DefineDayNightSchedule(NumHour);
 
-		if (EDayNightSchedule != ENewDayNightSchedule) {
+		if (EDayNightSchedule != ENewDayNightSchedule) 
+		{
 			EDayNightSchedule = ENewDayNightSchedule;
 			OnDayNightScheduleChangeDelegate.Broadcast(EDayNightSchedule);
 		}
 
 		ECurrentDemiSeason = DefineDemiSeason(FullDateTime, SeasonKeyFrames);
+		// From one to zero
 		float DemiSeasonDelta = DefineDemiSeasonDelta(ECurrentDemiSeason, SeasonKeyFrames, FullDateTime);
+		// From zero to one
+		float InverseDelta = 1.0f - DemiSeasonDelta;
 
 		// Broadcast DemiSeason enum and DemiSeason duration delta. 
-		OnSeasonChangeDelegate.Broadcast(ECurrentDemiSeason, DemiSeasonDelta);
+		OnSeasonChangeDelegate.Broadcast(ECurrentDemiSeason, InverseDelta);
 	}
 
 	if (Day != PreviousDay)
@@ -588,19 +632,4 @@ void AAccurateDayNightStateBase::Tick(float DeltaTime)
 
 	//FString FullDateStr = FullDateTime.ToString(TEXT("%Y.%m.%d-%H.%M.%S"));
 	//UE_LOG(LogTemp, Warning, TEXT("FullDate: %s"), *FullDateStr);
-}
-
-void AAccurateDayNightStateBase::SetDayNightTransitionTime(int32 Hour, int32 Minute)
-{
-	float Value = (float)Minute + Hour * 60.0f;
-	if (Value >= 120.0f) {
-		UE_LOG(LogTemp, Warning, TEXT("No effect function call: SetDayNightTransitionTime. Day/Night transition time can not be more than 120 minutes. "));
-		return;
-	}
-
-	DayNightTransitionTime = FTimespan::FromMinutes(Value);
-}
-
-FTimespan AAccurateDayNightStateBase::GetDayNightTransitionTime() {
-	return DayNightTransitionTime;
 }

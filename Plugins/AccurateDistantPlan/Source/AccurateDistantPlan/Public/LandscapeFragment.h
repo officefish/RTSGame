@@ -11,7 +11,8 @@
 
 #include "Engine/Texture2D.h"
 
-#include "AccurateDayNightStateBase.h"
+//#include "AccurateDayNightStateBase.h"
+#include "CultureGameState.h"
 
 #include "LandscapeFragment.generated.h"
 
@@ -180,12 +181,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void SetLandscapeScale(float LandscapeScale);
 
-	UFUNCTION(BlueprintCallable)
-		void ChangeSeason(TEnumAsByte<EEDemiSeason> Season);
-
-	UFUNCTION(BlueprintCallable)
-		void SmoothChangeSeason(float Delta);
-
 public:
 
 	/**
@@ -207,7 +202,10 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-private:
+
+	virtual void SetRulesAdditions() {};
+
+protected:
 
 	FLandscapeFragmentRules LandscapeRules;
 		

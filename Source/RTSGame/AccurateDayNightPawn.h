@@ -3,8 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "RTSSmoothCameraPawn.h"
-#include "AccurateDayNightStateBase.h"
+#include "CultureGameStateBase.h"
+
 #include "AccurateDayNightPawn.generated.h"
 
 /**
@@ -23,6 +25,6 @@ public:
 private:
 	void GameSpeedUp();
 	void GameSpeedDown();
-	AAccurateDayNightStateBase* GetGameState() const;
+	ACultureGameStateBase* GetGameState() const;
 	
 };

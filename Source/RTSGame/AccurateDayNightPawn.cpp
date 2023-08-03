@@ -15,21 +15,23 @@ void AAccurateDayNightPawn::SetupPlayerInputComponent(class UInputComponent* Pla
 
 void AAccurateDayNightPawn::GameSpeedUp()
 {
-	AAccurateDayNightStateBase* GameState = GetGameState();
-	if (::IsValid(GameState)) {
+	ACultureGameStateBase* GameState = GetGameState();
+	if (::IsValid(GameState)) 
+	{
 		GameState->GameSpeedUp();
 	}
 }
 
 void AAccurateDayNightPawn::GameSpeedDown()
 {
-	AAccurateDayNightStateBase* GameState = GetGameState();
-	if (::IsValid(GameState)) {
+	ACultureGameStateBase* GameState = GetGameState();
+	if (::IsValid(GameState)) 
+	{
 		GameState->GameSpeedDown();
 	}
 }
 
-AAccurateDayNightStateBase* AAccurateDayNightPawn::GetGameState() const
+ACultureGameStateBase* AAccurateDayNightPawn::GetGameState() const
 {
-	return GetWorld() != NULL ? GetWorld()->GetGameState<AAccurateDayNightStateBase>() : NULL;
+	return GetWorld() != NULL ? GetWorld()->GetGameState<ACultureGameStateBase>() : NULL;
 }

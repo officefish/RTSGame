@@ -137,6 +137,16 @@ void USeasonLandscapeFragment::ChangeSeason(TEnumAsByte<EEDemiSeason> Season)
 			SetupWinterToSpring(LandscapeRules);
 			break;
 		}
+	case EEDemiSeason::Spring:
+		{
+			SetupSpring(LandscapeRules);
+			break;
+		}
+	case EEDemiSeason::SpringToSummer:
+	{
+		SetupSpringToSummer(LandscapeRules);
+		break;
+	}
 	}
 }
 
@@ -172,44 +182,27 @@ void USeasonLandscapeFragment::SetupSummer(FLandscapeFragmentRules Rules)
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Red_1_A")), Rules.Summer_BC_Red_1_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Red_1_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Red_1_A texture not applied"));
-	}
+	
 	// Red_2
 	if (::IsValid(Rules.Summer_BC_Red_2_T))
 	{ 
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Red_2_A")), Rules.Summer_BC_Red_2_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Red_2_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Red_2_A texture not applied"));
-	}
+	
 	// Green
 	if (::IsValid(Rules.Summer_BC_Green_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
-			FName(TEXT("BaseColor_Green_A")), Rules.Summer_BC_Green_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Green_A texture applied"));
+			FName(TEXT("BaseColor_Green_A")), Rules.Summer_BC_Green_T);	
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Green_A texture applied"));
-	}
+	
 	// Blue
 	if (::IsValid(Rules.Summer_BC_Blue_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Blue_A")), Rules.Summer_BC_Blue_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Blue_A texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Blue_A texture applied"));
 	}
 
 	// Normals
@@ -219,55 +212,34 @@ void USeasonLandscapeFragment::SetupSummer(FLandscapeFragmentRules Rules)
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Red_1_A")), Rules.Summer_Normal_Red_1_T);
 
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Red_1_A texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Red_1_A texture not applied"));
 	}
 	// Normal Red_2
 	if (::IsValid(Rules.Summer_Normal_Red_2_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Red_2_A")), Rules.Summer_Normal_Red_2_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Red_2_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Red_2_A texture not applied"));
-	}
+	
 	// Normal Green
 	if (::IsValid(Rules.Summer_Normal_Green_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Green_A")), Rules.Summer_Normal_Green_T);
 
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Green_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Green_A texture not applied"));
-	}
+	
 	// Normal Blue
 	if (::IsValid(Rules.Summer_Normal_Blue_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Blue_A")), Rules.Summer_Normal_Blue_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Blue_A texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Blue_A texture not applied"));
 	}
 
 	// Main Normal 
 	if (::IsValid(Rules.Main_Normal_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
-			FName(TEXT("Main_Normal_A")), Rules.Main_Normal_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Main_normal_A texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Main_Normal_A texture not applied"));
+			FName(TEXT("MainNormal_A")), Rules.Main_Normal_T);
 	}
 
 	// SPLAT
@@ -275,19 +247,21 @@ void USeasonLandscapeFragment::SetupSummer(FLandscapeFragmentRules Rules)
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("SPLAT_A")), Rules.Splat_T);
-		
-		UE_LOG(LogTemp, Warning, TEXT("SPLAT_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("SPLAT_A texture not applied"));
-	}
-
+	
 	// With winter A / B false
 	BlendMaterialInst->SetScalarParameterValue(
-		FName(TEXT("WithWinter_A")), 0.0f);
+		FName(TEXT("WithSnow_A")), 0.0f);
 
-	BlendMaterialInst->SetScalarParameterValue(
-		FName(TEXT("WithWinter_B")), 0.0f);
+	//BlendMaterialInst->SetScalarParameterValue(
+	//	FName(TEXT("WithSnow_B")), 0.0f);
+
+	/* Does not matter*/
+	//BlendMaterialInst->SetScalarParameterValue(
+	//	FName(TEXT("WithBlackCrones_A")), 0.0f);
+
+	//BlendMaterialInst->SetScalarParameterValue(
+	//	FName(TEXT("WithBlackCrones_B")), 0.0f);
 
 	// BlendDelta should be 0
 	BlendMaterialInst->SetScalarParameterValue(
@@ -304,44 +278,27 @@ void USeasonLandscapeFragment::SetupSummerToAutumn(FLandscapeFragmentRules Rules
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Red_1_A")), Rules.Summer_BC_Red_1_T);
+	}
 
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Red_1_A texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Red_1_A texture not applied"));
-	}
 	// Red_2
 	if (::IsValid(Rules.Summer_BC_Red_2_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Red_2_A")), Rules.Summer_BC_Red_2_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Red_2_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Red_2_A texture not applied"));
-	}
+	
 	// Green
 	if (::IsValid(Rules.Summer_BC_Green_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Green_A")), Rules.Summer_BC_Green_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Green_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Green_A texture applied"));
-	}
+	
 	// Blue
 	if (::IsValid(Rules.Summer_BC_Blue_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Blue_A")), Rules.Summer_BC_Blue_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Blue_A texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Blue_A texture applied"));
 	}
 
 	// Normals A
@@ -350,56 +307,34 @@ void USeasonLandscapeFragment::SetupSummerToAutumn(FLandscapeFragmentRules Rules
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Red_1_A")), Rules.Summer_Normal_Red_1_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Red_1_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Red_1_A texture not applied"));
-	}
+	
 	// Normal Red_2
 	if (::IsValid(Rules.Summer_Normal_Red_2_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Red_2_A")), Rules.Summer_Normal_Red_2_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Red_2_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Red_2_A texture not applied"));
-	}
+	
 	// Normal Green
 	if (::IsValid(Rules.Summer_Normal_Green_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Green_A")), Rules.Summer_Normal_Green_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Green_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Green_A texture not applied"));
-	}
+	
 	// Normal Blue
 	if (::IsValid(Rules.Summer_Normal_Blue_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Blue_A")), Rules.Summer_Normal_Blue_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Blue_A texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Blue_A texture not applied"));
 	}
 
 	// Main Normal 
 	if (::IsValid(Rules.Main_Normal_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
-			FName(TEXT("Main_Normal_A")), Rules.Main_Normal_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Main_normal_A texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Main_Normal_A texture not applied"));
+			FName(TEXT("MainNormal_A")), Rules.Main_Normal_T);
 	}
 
 	// SPLAT
@@ -407,13 +342,7 @@ void USeasonLandscapeFragment::SetupSummerToAutumn(FLandscapeFragmentRules Rules
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("SPLAT_A")), Rules.Splat_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("SPLAT_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("SPLAT_A texture not applied"));
-	}
-
 
 	// BaseColor-s B
 	// Red_1
@@ -421,44 +350,25 @@ void USeasonLandscapeFragment::SetupSummerToAutumn(FLandscapeFragmentRules Rules
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Red_1_B")), Rules.Autumn_BC_Red_1_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Red_1_B texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Red_1_B texture not applied"));
-	}
+	
 	// Red_2
 	if (::IsValid(Rules.Autumn_BC_Red_2_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Red_2_B")), Rules.Autumn_BC_Red_2_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Red_2_B texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Red_2_B texture not applied"));
 	}
 	// Green
 	if (::IsValid(Rules.Autumn_BC_Green_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Green_B")), Rules.Autumn_BC_Green_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Green_B texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Green_B texture applied"));
 	}
 	// Blue
 	if (::IsValid(Rules.Autumn_BC_Blue_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Blue_B")), Rules.Autumn_BC_Blue_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Blue_B texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Blue_B texture applied"));
 	}
 
 	// Normals B
@@ -467,56 +377,35 @@ void USeasonLandscapeFragment::SetupSummerToAutumn(FLandscapeFragmentRules Rules
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Red_1_B")), Rules.Autumn_Normal_Red_1_T);
+	}
 
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Red_1_B texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Red_1_B texture not applied"));
-	}
 	// Normal Red_2
 	if (::IsValid(Rules.Autumn_Normal_Red_2_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Red_2_B")), Rules.Autumn_Normal_Red_2_T);
+	}
 
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Red_2_B texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Red_2_B texture not applied"));
-	}
 	// Normal Green
 	if (::IsValid(Rules.Autumn_Normal_Green_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Green_B")), Rules.Autumn_Normal_Green_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Green_B texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Green_B texture not applied"));
-	}
+	
 	// Normal Blue
 	if (::IsValid(Rules.Autumn_Normal_Blue_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Blue_B")), Rules.Autumn_Normal_Blue_T);
+	}
 
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Blue_B texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Blue_B texture not applied"));
-	}
 
 	// Main Normal 
 	if (::IsValid(Rules.Main_Normal_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
-			FName(TEXT("Main_Normal_B")), Rules.Main_Normal_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Main_normal_B texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Main_Normal_B texture not applied"));
+			FName(TEXT("MainNormal_B")), Rules.Main_Normal_T);
 	}
 
 	// SPLAT
@@ -524,19 +413,20 @@ void USeasonLandscapeFragment::SetupSummerToAutumn(FLandscapeFragmentRules Rules
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("SPLAT_B")), Rules.Splat_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("SPLAT_B texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("SPLAT_B texture not applied"));
-	}
-
+	
 	// With winter A / B false
 	BlendMaterialInst->SetScalarParameterValue(
-		FName(TEXT("WithWinter_A")), 0.0f);
+		FName(TEXT("WithSnow_A")), 0.0f);
 
 	BlendMaterialInst->SetScalarParameterValue(
-		FName(TEXT("WithWinter_B")), 0.0f);
+		FName(TEXT("WithSnow_B")), 0.0f);
+
+	BlendMaterialInst->SetScalarParameterValue(
+		FName(TEXT("WithBlackCrones_A")), 0.0f);
+
+	BlendMaterialInst->SetScalarParameterValue(
+		FName(TEXT("WithBlackCrones_B")), 0.0f);
 
 	// BlendDelta should be 0
 	//BlendMaterialInst->SetScalarParameterValue(
@@ -553,44 +443,27 @@ void USeasonLandscapeFragment::SetupAutumn(FLandscapeFragmentRules Rules)
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Red_1_A")), Rules.Autumn_BC_Red_1_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Red_1_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Red_1_A texture not applied"));
-	}
+	
 	// Red_2
 	if (::IsValid(Rules.Autumn_BC_Red_2_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Red_2_A")), Rules.Autumn_BC_Red_2_T);
+	}
 
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Red_2_A texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Red_2_A texture not applied"));
-	}
 	// Green
 	if (::IsValid(Rules.Autumn_BC_Green_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Green_A")), Rules.Autumn_BC_Green_T);
+	}
 
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Green_A texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Green_A texture applied"));
-	}
 	// Blue
 	if (::IsValid(Rules.Autumn_BC_Blue_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Blue_A")), Rules.Autumn_BC_Blue_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Blue_A texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Blue_A texture applied"));
 	}
 
 	// Normals B
@@ -599,44 +472,27 @@ void USeasonLandscapeFragment::SetupAutumn(FLandscapeFragmentRules Rules)
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Red_1_A")), Rules.Autumn_Normal_Red_1_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Red_1_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Red_1_A texture not applied"));
-	}
+	
 	// Normal Red_2
 	if (::IsValid(Rules.Autumn_Normal_Red_2_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Red_2_A")), Rules.Autumn_Normal_Red_2_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Red_2_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Red_2_A texture not applied"));
-	}
+	
 	// Normal Green
 	if (::IsValid(Rules.Autumn_Normal_Green_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Green_A")), Rules.Autumn_Normal_Green_T);
+	}
 
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Green_A texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Green_A texture not applied"));
-	}
 	// Normal Blue
 	if (::IsValid(Rules.Autumn_Normal_Blue_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Blue_A")), Rules.Autumn_Normal_Blue_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Blue_A texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Blue_A texture not applied"));
 	}
 
 	// Main Normal 
@@ -644,31 +500,21 @@ void USeasonLandscapeFragment::SetupAutumn(FLandscapeFragmentRules Rules)
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Main_Normal_A")), Rules.Main_Normal_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Main_normal_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Main_Normal_A texture not applied"));
-	}
-
+	
 	// SPLAT
 	if (::IsValid(Rules.Splat_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("SPLAT_A")), Rules.Splat_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("SPLAT_A texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("SPLAT_A texture not applied"));
 	}
 
 	// With winter A / B false
 	BlendMaterialInst->SetScalarParameterValue(
-		FName(TEXT("WithWinter_A")), 0.0f);
+		FName(TEXT("WithSnow_A")), 0.0f);
 
 	BlendMaterialInst->SetScalarParameterValue(
-		FName(TEXT("WithWinter_B")), 0.0f);
+		FName(TEXT("WithSnow_B")), 0.0f);
 
 	// BlendDelta should be 0
 	BlendMaterialInst->SetScalarParameterValue(
@@ -685,44 +531,27 @@ void USeasonLandscapeFragment::SetupAutumnToWinter(FLandscapeFragmentRules Rules
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Red_1_A")), Rules.Autumn_BC_Red_1_T);
+	}
 
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Red_1_A texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Red_1_A texture not applied"));
-	}
 	// Red_2
 	if (::IsValid(Rules.Autumn_BC_Red_2_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Red_2_A")), Rules.Autumn_BC_Red_2_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Red_2_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Red_2_A texture not applied"));
-	}
+	
 	// Green
 	if (::IsValid(Rules.Autumn_BC_Green_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Green_A")), Rules.Autumn_BC_Green_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Green_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Green_A texture applied"));
-	}
+	
 	// Blue
 	if (::IsValid(Rules.Autumn_BC_Blue_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Blue_A")), Rules.Autumn_BC_Blue_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Blue_A texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Blue_A texture applied"));
 	}
 
 	// Normals A
@@ -731,56 +560,34 @@ void USeasonLandscapeFragment::SetupAutumnToWinter(FLandscapeFragmentRules Rules
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Red_1_A")), Rules.Autumn_Normal_Red_1_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Red_1_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Red_1_A texture not applied"));
-	}
+	
 	// Normal Red_2
 	if (::IsValid(Rules.Autumn_Normal_Red_2_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Red_2_A")), Rules.Autumn_Normal_Red_2_T);
+	}
 
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Red_2_A texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Red_2_A texture not applied"));
-	}
 	// Normal Green
 	if (::IsValid(Rules.Autumn_Normal_Green_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Green_A")), Rules.Autumn_Normal_Green_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Green_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Green_A texture not applied"));
-	}
+	
 	// Normal Blue
 	if (::IsValid(Rules.Autumn_Normal_Blue_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Blue_A")), Rules.Autumn_Normal_Blue_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Blue_A texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Blue_A texture not applied"));
 	}
 
 	// Main Normal 
 	if (::IsValid(Rules.Main_Normal_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
-			FName(TEXT("Main_Normal_A")), Rules.Main_Normal_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Main_normal_A texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Main_Normal_A texture not applied"));
+			FName(TEXT("MainNormal_A")), Rules.Main_Normal_T);
 	}
 
 	// SPLAT
@@ -788,14 +595,8 @@ void USeasonLandscapeFragment::SetupAutumnToWinter(FLandscapeFragmentRules Rules
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("SPLAT_A")), Rules.Splat_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("SPLAT_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("SPLAT_A texture not applied"));
-	}
-
-
+	
 	// BaseColor-s B
 	
 	if (::IsValid(Rules.Winter_BC_T))
@@ -811,25 +612,15 @@ void USeasonLandscapeFragment::SetupAutumnToWinter(FLandscapeFragmentRules Rules
 
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Blue_B")), Rules.Winter_BC_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Rock_B texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Rock_B texture not applied"));
-	}
+	
 	// Snow
 	if (::IsValid(Rules.Winter_Snow_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Snow_B")), Rules.Winter_Snow_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Snow_B texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Snow_B texture applied"));
-	}
-
-
+	
 	// Normals B
 	// Normal Rock
 	if (::IsValid(Rules.Winter_BC_Normal_T))
@@ -845,35 +636,20 @@ void USeasonLandscapeFragment::SetupAutumnToWinter(FLandscapeFragmentRules Rules
 
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Blue_B")), Rules.Winter_BC_Normal_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Rock_B texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Rock_B texture not applied"));
-	}
+	
 	// Normal Snow
 	if (::IsValid(Rules.Winter_Snow_Normal_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Snow_B")), Rules.Winter_Snow_Normal_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Snow_B texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Snow_B texture not applied"));
 	}
 	
-
 	// Main Normal 
 	if (::IsValid(Rules.Main_Normal_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
-			FName(TEXT("Main_Normal_B")), Rules.Main_Normal_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Main_normal_B texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Main_Normal_B texture not applied"));
+			FName(TEXT("MainNormal_B")), Rules.Main_Normal_T);
 	}
 
 	// SPLAT
@@ -881,19 +657,21 @@ void USeasonLandscapeFragment::SetupAutumnToWinter(FLandscapeFragmentRules Rules
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("SPLAT_B")), Rules.Winter_Splat_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("SPLAT_B texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("SPLAT_B texture not applied"));
-	}
-
+	
 	// With winter A / B false
 	BlendMaterialInst->SetScalarParameterValue(
-		FName(TEXT("WithWinter_A")), 0.0f);
+		FName(TEXT("WithSnow_A")), 0.0f);
 
 	BlendMaterialInst->SetScalarParameterValue(
-		FName(TEXT("WithWinter_B")), 1.0f);
+		FName(TEXT("WithSnow_B")), 1.0f);
+
+	BlendMaterialInst->SetScalarParameterValue(
+		FName(TEXT("WithBlackCrones_A")), 0.0f);
+
+	BlendMaterialInst->SetScalarParameterValue(
+		FName(TEXT("WithBlackCrones_B")), 1.0f);
+
 }
 
 void USeasonLandscapeFragment::SetupWinter(FLandscapeFragmentRules Rules)
@@ -916,23 +694,14 @@ void USeasonLandscapeFragment::SetupWinter(FLandscapeFragmentRules Rules)
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Blue_A")), Rules.Winter_BC_T);
 
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Rock_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Rock_A texture not applied"));
-	}
+	
 	// Snow
 	if (::IsValid(Rules.Winter_Snow_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Snow_A")), Rules.Winter_Snow_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Snow_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Snow_A texture applied"));
-	}
-
 
 	// Normals B
 	// Normal Rock
@@ -949,34 +718,20 @@ void USeasonLandscapeFragment::SetupWinter(FLandscapeFragmentRules Rules)
 
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Blue_A")), Rules.Winter_BC_Normal_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Rock_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Rock_A texture not applied"));
-	}
+	
 	// Normal Snow
 	if (::IsValid(Rules.Winter_Snow_Normal_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Snow_A")), Rules.Winter_Snow_Normal_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Snow_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Snow_A texture not applied"));
-	}
-
+	
 	// Main Normal 
 	if (::IsValid(Rules.Main_Normal_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
-			FName(TEXT("Main_Normal_B")), Rules.Main_Normal_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Main_normal_B texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Main_Normal_B texture not applied"));
+			FName(TEXT("MainNormal_A")), Rules.Main_Normal_T);
 	}
 
 	// SPLAT
@@ -984,19 +739,17 @@ void USeasonLandscapeFragment::SetupWinter(FLandscapeFragmentRules Rules)
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("SPLAT_A")), Rules.Winter_Splat_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("SPLAT_A texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("SPLAT_A texture not applied"));
 	}
 
 	// With winter A / B false
 	BlendMaterialInst->SetScalarParameterValue(
-		FName(TEXT("WithWinter_A")), 1.0f);
+		FName(TEXT("WithSnow_A")), 1.0f);
 
 	BlendMaterialInst->SetScalarParameterValue(
-		FName(TEXT("WithWinter_B")), 0.0f);
+		FName(TEXT("WithBlackCrones_A")), 1.0f);
+
+	//BlendMaterialInst->SetScalarParameterValue(
+	//	FName(TEXT("WithSnow_B")), 1.0f);
 
 	// BlendDelta should be 0
 	BlendMaterialInst->SetScalarParameterValue(
@@ -1022,25 +775,14 @@ void USeasonLandscapeFragment::SetupWinterToSpring(FLandscapeFragmentRules Rules
 
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Blue_A")), Rules.Winter_BC_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Rock_A texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Rock_A texture not applied"));
 	}
 	// Snow
 	if (::IsValid(Rules.Winter_Snow_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Snow_A")), Rules.Winter_Snow_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Snow_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Snow_A texture applied"));
-	}
-
-
+	
 	// Normals B
 	// Normal Rock
 	if (::IsValid(Rules.Winter_BC_Normal_T))
@@ -1056,34 +798,20 @@ void USeasonLandscapeFragment::SetupWinterToSpring(FLandscapeFragmentRules Rules
 
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Blue_A")), Rules.Winter_BC_Normal_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Rock_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Rock_A texture not applied"));
-	}
+	
 	// Normal Snow
 	if (::IsValid(Rules.Winter_Snow_Normal_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Snow_A")), Rules.Winter_Snow_Normal_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Snow_A texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Snow_A texture not applied"));
 	}
 
 	// Main Normal 
 	if (::IsValid(Rules.Main_Normal_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
-			FName(TEXT("Main_Normal_A")), Rules.Main_Normal_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Main_normal_B texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Main_Normal_B texture not applied"));
+			FName(TEXT("MainNormal_A")), Rules.Main_Normal_T);
 	}
 
 	// SPLAT
@@ -1091,161 +819,110 @@ void USeasonLandscapeFragment::SetupWinterToSpring(FLandscapeFragmentRules Rules
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("SPLAT_A")), Rules.Winter_Splat_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("SPLAT_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("SPLAT_A texture not applied"));
-	}
-
+	
 	// BaseColor-s B
 	// Red_1
 	if (::IsValid(Rules.Spring_BC_Red_1_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Red_1_B")), Rules.Spring_BC_Red_1_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Red_1_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Red_1_A texture not applied"));
-	}
+	
 	// Red-2
 	if (::IsValid(Rules.Spring_BC_Red_2_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Red_2_B")), Rules.Spring_BC_Red_2_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Red_2_B texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Red_2_B texture not applied"));
-	}
+	
 	// Green
 	if (::IsValid(Rules.Spring_BC_Green_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Green_B")), Rules.Spring_BC_Green_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Green_B texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Green_B texture not applied"));
-	}
+	
 	// Blue
 	if (::IsValid(Rules.Spring_BC_Blue_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Blue_B")), Rules.Spring_BC_Blue_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Blue_B texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Blue_B texture not applied"));
-	}
+	
 
 	// Snow
 	if (::IsValid(Rules.Spring_BC_Snow_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("BaseColor_Snow_B")), Rules.Spring_BC_Snow_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Snow_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("BaseColor_Snow_A texture applied"));
-	}
-
-
+	
 	// Normals B
 	// Normal Red-1
 	if (::IsValid(Rules.Spring_Normal_Red_1_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Red_1_B")), Rules.Spring_Normal_Red_1_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Red_1_B texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Red_1_B texture not applied"));
-	}
+	
 	// normal red-2
 	if (::IsValid(Rules.Spring_Normal_Red_2_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Red_2_B")), Rules.Spring_Normal_Red_2_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Red_2_B texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Red_2_B texture not applied"));
-	}
+	
 	// normal green
 	if (::IsValid(Rules.Spring_Normal_Green_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Green_B")), Rules.Spring_Normal_Green_T);
+	}
 
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Green_B texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Green_B texture not applied"));
-	}
 	// normal blue
 	if (::IsValid(Rules.Spring_Normal_Blue_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Blue_B")), Rules.Spring_Normal_Blue_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Blue_B texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Blue_B texture not applied"));
-	}
+	
 
 	// Normal Snow
 	if (::IsValid(Rules.Spring_Normal_Snow_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("Normal_Snow_B")), Rules.Spring_Normal_Snow_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Snow_B texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Normal_Snow_B texture not applied"));
-	}
+	
 
 	// Main Normal 
 	if (::IsValid(Rules.Main_Normal_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
-			FName(TEXT("Main_Normal_B")), Rules.Main_Normal_T);
+			FName(TEXT("MainNormal_B")), Rules.Main_Normal_T);
+	}
 
-		UE_LOG(LogTemp, Warning, TEXT("Main_normal_B texture applied"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Main_Normal_B texture not applied"));
-	}
 
 	// SPLAT
 	if (::IsValid(Rules.Splat_T))
 	{
 		BlendMaterialInst->SetTextureParameterValue(
 			FName(TEXT("SPLAT_B")), Rules.Splat_T);
-
-		UE_LOG(LogTemp, Warning, TEXT("SPLAT_A texture applied"));
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("SPLAT_A texture not applied"));
-	}
-
 
 	// With winter A / B false
 	BlendMaterialInst->SetScalarParameterValue(
-		FName(TEXT("WithWinter_A")), 1.0f);
+		FName(TEXT("WithSnow_A")), 1.0f);
 
 	BlendMaterialInst->SetScalarParameterValue(
-		FName(TEXT("WithWinter_B")), 1.0f);
+		FName(TEXT("WithBlackCrones_A")), 1.0f);
+
+	BlendMaterialInst->SetScalarParameterValue(
+		FName(TEXT("WithSnow_B")), 1.0f);
+
+	BlendMaterialInst->SetScalarParameterValue(
+		FName(TEXT("WithBlackCrones_B")), 0.0f);
 
 	// BlendDelta should be 0
 	//BlendMaterialInst->SetScalarParameterValue(
@@ -1254,10 +931,280 @@ void USeasonLandscapeFragment::SetupWinterToSpring(FLandscapeFragmentRules Rules
 
 void USeasonLandscapeFragment::SetupSpring(FLandscapeFragmentRules Rules)
 {
+	// BaseColor-s B
+	// Red_1
+	if (::IsValid(Rules.Spring_BC_Red_1_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("BaseColor_Red_1_A")), Rules.Spring_BC_Red_1_T);
+	}
 
+	// Red-2
+	if (::IsValid(Rules.Spring_BC_Red_2_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("BaseColor_Red_2_A")), Rules.Spring_BC_Red_2_T);
+	}
+
+	// Green
+	if (::IsValid(Rules.Spring_BC_Green_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("BaseColor_Green_A")), Rules.Spring_BC_Green_T);
+	}
+
+	// Blue
+	if (::IsValid(Rules.Spring_BC_Blue_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("BaseColor_Blue_A")), Rules.Spring_BC_Blue_T);
+	}
+
+
+	// Snow
+	if (::IsValid(Rules.Spring_BC_Snow_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("BaseColor_Snow_A")), Rules.Spring_BC_Snow_T);
+	}
+
+	// Normals B
+	// Normal Red-1
+	if (::IsValid(Rules.Spring_Normal_Red_1_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("Normal_Red_1_A")), Rules.Spring_Normal_Red_1_T);
+	}
+
+	// normal red-2
+	if (::IsValid(Rules.Spring_Normal_Red_2_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("Normal_Red_2_A")), Rules.Spring_Normal_Red_2_T);
+	}
+
+	// normal green
+	if (::IsValid(Rules.Spring_Normal_Green_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("Normal_Green_A")), Rules.Spring_Normal_Green_T);
+	}
+
+	// normal blue
+	if (::IsValid(Rules.Spring_Normal_Blue_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("Normal_Blue_A")), Rules.Spring_Normal_Blue_T);
+	}
+
+
+	// Normal Snow
+	if (::IsValid(Rules.Spring_Normal_Snow_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("Normal_Snow_A")), Rules.Spring_Normal_Snow_T);
+	}
+
+
+	// Main Normal 
+	if (::IsValid(Rules.Main_Normal_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("MainNormal_A")), Rules.Main_Normal_T);
+	}
+
+
+	// SPLAT
+	if (::IsValid(Rules.Splat_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("SPLAT_A")), Rules.Splat_T);
+	}
+
+	// With winter A / B false
+	BlendMaterialInst->SetScalarParameterValue(
+		FName(TEXT("WithWinter_A")), 1.0f);
+
+	BlendMaterialInst->SetScalarParameterValue(
+		FName(TEXT("WithBlackCrones_A")), 0.0f);
+
+	//BlendMaterialInst->SetScalarParameterValue(
+	//	FName(TEXT("WithWinter_B")), 1.0f);
+
+	// BlendDelta should be 0
+	BlendMaterialInst->SetScalarParameterValue(
+		FName(TEXT("BlendDelta")), 0.0f);
 }
 
 void USeasonLandscapeFragment::SetupSpringToSummer(FLandscapeFragmentRules Rules)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Customise Spring to Summer textures"));
 
+	// BaseColor-s A
+	// Red 1
+	if (::IsValid(Rules.Spring_BC_Red_1_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("BaseColor_Red_1_A")), Rules.Spring_BC_Red_1_T);
+	}
+	// Red 2
+	if (::IsValid(Rules.Spring_BC_Red_2_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("BaseColor_Red_2_A")), Rules.Spring_BC_Red_2_T);
+	}
+	// Green
+	if (::IsValid(Rules.Spring_BC_Green_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("BaseColor_Green_A")), Rules.Spring_BC_Green_T);
+	}
+	// Blue
+	if (::IsValid(Rules.Spring_BC_Blue_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("BaseColor_Blue_A")), Rules.Spring_BC_Blue_T);
+	}
+	// Snow
+	if (::IsValid(Rules.Spring_BC_Snow_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("BaseColor_Snow_A")), Rules.Spring_BC_Snow_T);
+	}
+
+	// Normals A
+	// Normal Red 1
+	if (::IsValid(Rules.Spring_BC_Red_1_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("Normal_Red_1_A")), Rules.Spring_BC_Red_1_T);
+	}
+	// Normal red 2
+	if (::IsValid(Rules.Spring_BC_Red_2_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("Normal_Red_2_A")), Rules.Spring_BC_Red_2_T);
+	}
+	// Normal green
+	if (::IsValid(Rules.Spring_BC_Green_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("Normal_Green_A")), Rules.Spring_BC_Green_T);
+	}
+	// Normal blue 
+	if (::IsValid(Rules.Spring_BC_Blue_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("Normal_Blue_A")), Rules.Spring_BC_Blue_T);
+	}
+	// Normal Snow
+	if (::IsValid(Rules.Spring_Normal_Snow_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("Normal_Snow_A")), Rules.Spring_Normal_Snow_T);
+	}
+
+	// Main Normal 
+	if (::IsValid(Rules.Main_Normal_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("MainNormal_A")), Rules.Main_Normal_T);
+	}
+
+	// SPLAT
+	if (::IsValid(Rules.Splat_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("SPLAT_A")), Rules.Splat_T);
+	}
+
+	// BaseColor-s B
+	// Red_1
+	if (::IsValid(Rules.Summer_BC_Red_1_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("BaseColor_Red_1_B")), Rules.Summer_BC_Red_1_T);
+	}
+
+	// Red-2
+	if (::IsValid(Rules.Summer_BC_Red_2_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("BaseColor_Red_2_B")), Rules.Summer_BC_Red_2_T);
+	}
+
+	// Green
+	if (::IsValid(Rules.Summer_BC_Green_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("BaseColor_Green_B")), Rules.Summer_BC_Green_T);
+	}
+
+	// Blue
+	if (::IsValid(Rules.Summer_BC_Blue_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("BaseColor_Blue_B")), Rules.Summer_BC_Blue_T);
+	}
+
+
+	// Normals B
+	// Normal Red-1
+	if (::IsValid(Rules.Summer_Normal_Red_1_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("Normal_Red_1_B")), Rules.Summer_Normal_Red_1_T);
+	}
+
+	// normal red-2
+	if (::IsValid(Rules.Summer_Normal_Red_2_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("Normal_Red_2_B")), Rules.Summer_Normal_Red_2_T);
+	}
+
+	// normal green
+	if (::IsValid(Rules.Summer_Normal_Green_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("Normal_Green_B")), Rules.Summer_Normal_Green_T);
+	}
+
+	// normal blue
+	if (::IsValid(Rules.Summer_Normal_Blue_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("Normal_Blue_B")), Rules.Summer_Normal_Blue_T);
+	}
+
+	// Main Normal 
+	if (::IsValid(Rules.Main_Normal_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("MainNormal_B")), Rules.Main_Normal_T);
+	}
+
+	// SPLAT
+	if (::IsValid(Rules.Splat_T))
+	{
+		BlendMaterialInst->SetTextureParameterValue(
+			FName(TEXT("SPLAT_B")), Rules.Splat_T);
+	}
+
+	// With winter A / B false
+	BlendMaterialInst->SetScalarParameterValue(
+		FName(TEXT("WithSnow_A")), 1.0f);
+
+	BlendMaterialInst->SetScalarParameterValue(
+		FName(TEXT("WithBlackCrones_A")), 0.0f);
+
+	BlendMaterialInst->SetScalarParameterValue(
+		FName(TEXT("WithSnow_B")), 0.0f);
+
+	BlendMaterialInst->SetScalarParameterValue(
+		FName(TEXT("WithBlackCrones_B")), 0.0f);
+
+	// BlendDelta should be 0
+	//BlendMaterialInst->SetScalarParameterValue(
+	//	FName(TEXT("BlendDelta")), 0.0f);
 }

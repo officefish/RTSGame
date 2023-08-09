@@ -10,6 +10,9 @@ ACultureGameStateBase::ACultureGameStateBase()
 
 	bWithSlowMotion = false;
 	bWithX50Time = false;
+	bWithX500Time = false;
+	bWithNextDay = false;
+
 	bWithRealTime = true;
 	EGameSpeed = EEGameSpeed::GameTime;
 
@@ -20,10 +23,8 @@ ACultureGameStateBase::ACultureGameStateBase()
 	DemiSeasonInconstancy = FTimespan::FromDays(7.0f);
 
 	SetGameTimeMultiplier(60.0f);
-	SetGameStartDateTime(FDateTime::UtcNow());
 
-	//
-	SeasonKeyFrames = CalculateSeasonKeyFrames(GameStartDateTime);
+	SetGameStartDateTime(FDateTime::UtcNow());
 
 	SunriseTime = FTimespan::FromHours(8.0f);
 	SunsetTime = FTimespan::FromHours(21.0f);
@@ -31,8 +32,6 @@ ACultureGameStateBase::ACultureGameStateBase()
 	DayNightTransitionTime = FTimespan::FromMinutes(35.0f);
 
 	bWithDayNightCycle = true;
-
-	/*Setup default DemiSeason entities */
 
 }
 
@@ -149,7 +148,8 @@ void ACultureGameStateBase::SetGameTimeMultiplier(float Value)
 {
 	GameTimeMultiplier = Value;
 	GameTimeMultiplierX2 = Value * 2;
-	GameTimeMultiplierX5 = Value * 5;	GameTimeMultiplierX50 = Value * 50;
+	GameTimeMultiplierX5 = Value * 5;	
+	GameTimeMultiplierX50 = Value * 50;
 	GameTimeMultiplierX500 = Value * 500;
 }
 
@@ -169,6 +169,17 @@ void ACultureGameStateBase::SetGameStartDateTime(const FDateTime& DateTime)
 	TimePasses = FTimespan(0, 0, 0, 0);
 	FullDateTime = DateTime;
 	TotalSeconds = 0.0f;
+
+	/* Define Schedule */
+	int NumHour = GameStartDateTime.GetHour();
+	ValidateDayNightSchedule(NumHour);
+
+	/* Recalculate Season KeyFrames */
+	SeasonKeyFrames = CalculateSeasonKeyFrames(GameStartDateTime);
+
+	/* Define Demiseason*/
+	ValidateDemiSeason();
+
 }
 
 //
@@ -205,9 +216,12 @@ float ACultureGameStateBase::GetTimeMuliplier()
 	else if (EGameSpeed == EEGameSpeed::GameTimeX50) {
 		return GameTimeMultiplierX50;
 	}
-	else {
+	else if (EGameSpeed == EEGameSpeed::GameTimeX500) {
 		return GameTimeMultiplierX500;
-	}
+	} 
+	
+	return 0.0f;
+	
 }
 
 //
@@ -243,22 +257,38 @@ void ACultureGameStateBase::GameSpeedUp()
 	else if (EGameSpeed == EEGameSpeed::GameTimeX2) {
 		EGameSpeed = EEGameSpeed::GameTimeX5;
 	}
+
 	else if (EGameSpeed == EEGameSpeed::GameTimeX5) {
+
 		if (bWithX50Time) {
 			EGameSpeed = EEGameSpeed::GameTimeX50;
 		}
+		else if (bWithX500Time) {
+			EGameSpeed = EEGameSpeed::GameTimeX500;
+		}
+		else if (bWithNextDay) {
+			EGameSpeed = EEGameSpeed::GameTimeNextDay;
+		}
 		else {
-			if (bWithX500Time) {
-				EGameSpeed = EEGameSpeed::GameTimeX500;
-			}
-			else {
-				bNeedBroadcast = false;
-			}
+			bNeedBroadcast = false;
 		}
 	}
+
 	else if (EGameSpeed == EEGameSpeed::GameTimeX50) {
+		
 		if (bWithX500Time) {
 			EGameSpeed = EEGameSpeed::GameTimeX500;
+		}
+		else if (bWithNextDay) {
+			EGameSpeed = EEGameSpeed::GameTimeNextDay;
+		}
+		else {
+			bNeedBroadcast = false;
+		}
+	}
+	else if (EGameSpeed == EEGameSpeed::GameTimeX500) {
+		if (bWithNextDay) {
+			EGameSpeed = EEGameSpeed::GameTimeNextDay;
 		}
 		else {
 			bNeedBroadcast = false;
@@ -267,7 +297,7 @@ void ACultureGameStateBase::GameSpeedUp()
 	else {
 		bNeedBroadcast = false;
 	}
-
+		
 	if (bNeedBroadcast) {
 		OnGameSpeedChangeDelegate.Broadcast(EGameSpeed);
 	}
@@ -277,7 +307,18 @@ void ACultureGameStateBase::GameSpeedUp()
 void ACultureGameStateBase::GameSpeedDown()
 {
 	bool bNeedBroadcast = true;
-	if (EGameSpeed == EEGameSpeed::GameTimeX500) {
+
+	if (EGameSpeed == EEGameSpeed::GameTimeNextDay) {
+		if (bWithX500Time) {
+			EGameSpeed = EEGameSpeed::GameTimeX500;
+		} else if (bWithX50Time) {
+			EGameSpeed = EEGameSpeed::GameTimeX50;
+		}
+		else {
+			EGameSpeed = EEGameSpeed::GameTimeX5;
+		}
+	}
+	else if (EGameSpeed == EEGameSpeed::GameTimeX500) {
 		if (bWithX50Time) {
 			EGameSpeed = EEGameSpeed::GameTimeX50;
 		}
@@ -561,15 +602,83 @@ FTimespan ACultureGameStateBase::GetDayNightTransitionTime()
 	return DayNightTransitionTime;
 }
 
+/* Validations */
+void ACultureGameStateBase::ValidateDayNightCircle(int32 NumMinutes)
+{
+	TEnumAsByte<EEDayNightCicle> ENewDayNightCycle = DefineDayNightCycle(NumMinutes);
+
+	if (ENewDayNightCycle != EDayNightCycle)
+	{
+		EDayNightCycle = ENewDayNightCycle;
+		OnDayNightCycleChangeDelegate.Broadcast(EDayNightCycle);
+	}
+}
+
+
+void ACultureGameStateBase::ValidateDayNightSchedule(int32 NumHour)
+{
+	TEnumAsByte<EEDayNightSchedule> ENewDayNightSchedule = DefineDayNightSchedule(NumHour);
+
+	if (EDayNightSchedule != ENewDayNightSchedule)
+	{
+		EDayNightSchedule = ENewDayNightSchedule;
+		OnDayNightScheduleChangeDelegate.Broadcast(EDayNightSchedule);
+	}
+}
+
+void ACultureGameStateBase::ValidateDemiSeason()
+{
+
+	ECurrentDemiSeason = DefineDemiSeason(FullDateTime, SeasonKeyFrames);
+	// From one to zero
+	float DemiSeasonDelta = DefineDemiSeasonDelta(ECurrentDemiSeason, SeasonKeyFrames, FullDateTime);
+	// From zero to one
+	float InverseDelta = 1.0f - DemiSeasonDelta;
+
+	// Broadcast DemiSeason enum and DemiSeason duration delta. 
+	OnSeasonChangeDelegate.Broadcast(ECurrentDemiSeason, InverseDelta);
+}
+
+void ACultureGameStateBase::NextDayTick()
+{
+	int32 PreviousYear = FullDateTime.GetYear();
+
+	TimePasses += FTimespan::FromDays(1.0f);
+	FullDateTime = GameStartDateTime;
+	FullDateTime += TimePasses;
+
+	int32 Year = FullDateTime.GetYear();
+
+	if (Year != PreviousYear)
+	{
+		SeasonKeyFrames = CalculateSeasonKeyFrames(FullDateTime);
+	}
+
+	ValidateDemiSeason();
+
+	/* New day broadcast */
+	OnNewDayDelegate.Broadcast();
+
+	/* Tick broadcast */
+	OnGameStateTickDelegate.Broadcast(FullDateTime);
+}
+
 //
 void ACultureGameStateBase::Tick(float DeltaTime)
 {
+	if (EGameSpeed == EEGameSpeed::GameTimeNextDay)
+	{
+		NextDayTick();
+		return;
+	}
+
 	float DeltaTimeMyltiply = DeltaTime * GetTimeMuliplier();
 	TimePasses += FTimespan::FromSeconds(DeltaTimeMyltiply);
 
 	int32 PreviousHour = FullDateTime.GetHour();
 	int32 PreviousMinutes = PreviousHour * 60 + FullDateTime.GetMinute();;
 	int32 PreviousDay = FullDateTime.GetDay();
+	int32 PreviousYear = FullDateTime.GetYear();
 
 	FullDateTime = GameStartDateTime;
 	FullDateTime += TimePasses;
@@ -577,38 +686,22 @@ void ACultureGameStateBase::Tick(float DeltaTime)
 	int32 NumHour = FullDateTime.GetHour();
 	int32 NumMinutes = NumHour * 60 + FullDateTime.GetMinute();
 	int32 Day = FullDateTime.GetDay();
+	int32 Year = FullDateTime.GetYear();
+
+	if (Year != PreviousYear)
+	{
+		SeasonKeyFrames = CalculateSeasonKeyFrames(FullDateTime);
+	}
 
 	if (PreviousMinutes != NumMinutes && bWithDayNightCycle) 
 	{
-
-		TEnumAsByte<EEDayNightCicle> ENewDayNightCycle = DefineDayNightCycle(NumMinutes);
-
-		if (ENewDayNightCycle != EDayNightCycle) 
-		{
-			EDayNightCycle = ENewDayNightCycle;
-			OnDayNightCycleChangeDelegate.Broadcast(EDayNightCycle);
-		}
+		ValidateDayNightCircle(NumMinutes);
 	}
 
 	if (NumHour != PreviousHour) 
 	{
-
-		TEnumAsByte<EEDayNightSchedule> ENewDayNightSchedule = DefineDayNightSchedule(NumHour);
-
-		if (EDayNightSchedule != ENewDayNightSchedule) 
-		{
-			EDayNightSchedule = ENewDayNightSchedule;
-			OnDayNightScheduleChangeDelegate.Broadcast(EDayNightSchedule);
-		}
-
-		ECurrentDemiSeason = DefineDemiSeason(FullDateTime, SeasonKeyFrames);
-		// From one to zero
-		float DemiSeasonDelta = DefineDemiSeasonDelta(ECurrentDemiSeason, SeasonKeyFrames, FullDateTime);
-		// From zero to one
-		float InverseDelta = 1.0f - DemiSeasonDelta;
-
-		// Broadcast DemiSeason enum and DemiSeason duration delta. 
-		OnSeasonChangeDelegate.Broadcast(ECurrentDemiSeason, InverseDelta);
+		ValidateDayNightSchedule(NumHour);
+		ValidateDemiSeason();
 	}
 
 	if (Day != PreviousDay)
@@ -624,6 +717,8 @@ void ACultureGameStateBase::Tick(float DeltaTime)
 		FString FullDateStr = FullDateTime.ToString(TEXT("%Y.%m.%d-%H.%M.%S"));
 		UE_LOG(LogTemp, Warning, TEXT("FullDate: %s"), *FullDateStr);
 	}
+
+	
 
 	OnGameStateTickDelegate.Broadcast(FullDateTime);
 

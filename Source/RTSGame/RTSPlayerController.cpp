@@ -30,12 +30,14 @@ void ARTSPlayerController::PostEditChangeProperty(FPropertyChangedEvent& Propert
             GameState->bWithRealTime = true;
             GameState->bWithX50Time = true;
             GameState->bWithX500Time = true;
+            GameState->bWithNextDay = true;
         }
         else {
             //UE_LOG(LogTemp, Warning, TEXT("Do something when not debug mode"));
             GameState->bWithRealTime = false;
             GameState->bWithX50Time = false;
             GameState->bWithX500Time = false;
+            GameState->bWithNextDay = false;
         }
     }
 

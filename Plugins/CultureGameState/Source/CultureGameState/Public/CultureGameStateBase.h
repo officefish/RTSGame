@@ -71,6 +71,7 @@ enum class EEGameSpeed : uint8
 	GameTimeX5		UMETA(DisplayName = "GameTimeX5"),
 	GameTimeX50		UMETA(DisplayName = "GameTimeX50"),
 	GameTimeX500	UMETA(DisplayName = "GameTimeX500"),
+	GameTimeNextDay	UMETA(DisplayName = "GameTimeNextDay"),
 };
 
 /* Night Circle Enum */
@@ -134,16 +135,16 @@ public:
 	UFUNCTION(BlueprintPure, Category = "GameDatetime", meta = (DefaultToSelf = Target))
 		float GetGameSolarTime();
 
-	UFUNCTION(BlueprintCallable, Category = "AccurateDayNight")
+	UFUNCTION(BlueprintCallable, Category = "CultureGameState")
 		void SetGameSpeed(TEnumAsByte<EEGameSpeed> EGameSpeedStatus);
 
-	UFUNCTION(BlueprintCallable, Category = "AccurateDayNight")
+	UFUNCTION(BlueprintCallable, Category = "CultureGameState")
 		void SetGameTimeMultiplier(float Value);
 
-	UFUNCTION(BlueprintPure, Category = "AccurateDayNight")
+	UFUNCTION(BlueprintPure, Category = "CultureGameState")
 		float GetGameTimeMultiplier();
 
-	UFUNCTION(BlueprintCallable, Category = "AccurateDayNight")
+	UFUNCTION(BlueprintCallable, Category = "CultureGameState")
 		void SetGameStartDateTime(const FDateTime& DateTime);
 
 	//// Day/Night Transition Setup
@@ -208,6 +209,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AccurateDayNight")
 		bool bWithX500Time;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AccurateDayNight")
+		bool bWithNextDay;
+
+
 	// Day Night Cicle
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AccurateDayNight")
 		FTimespan SunsetTime;
@@ -244,6 +249,13 @@ private:
 		TEnumAsByte<EEDemiSeason> CurrentSeason,
 		const FDemiSeasonKeyFrames& CurrentSeasonKeyFrames,
 		const FDateTime& CurrentDateTime);
+
+	void ValidateDayNightSchedule(int32 NumHour);
+	void ValidateDayNightCircle(int32 NumMinutes);
+	void ValidateDemiSeason();
+
+	void NextDayTick();
+
 
 protected:
 
